@@ -1,6 +1,7 @@
 package com.investigacion_operaciones.java;
 
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 
 public class SupplyPlanning extends Helpers {

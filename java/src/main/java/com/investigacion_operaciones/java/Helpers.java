@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Locale;
 
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 
 public class Helpers {
