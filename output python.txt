@@ -1,0 +1,757 @@
+output python:
+
+ejercicio #1:
+
+2. VARIABLES DE DECISIÓN
+X1 = número de sillas que debe producir la fábrica diariamente
+X2 = número de mesas que debe producir la fábrica diariamente
+
+3. FUNCIÓN OBJETIVO
+Max Z = 30X1 + 50X2
+
+4. RESTRICCIONES
+2X1 + 5X2 <= 100   -> Restricción de tiempo
+X1 + 3X2 <= 60     -> Restricción de material
+X1 <= 20           -> Demanda máxima de sillas
+X2 <= 10           -> Demanda máxima de mesas
+X1, X2 >= 0
+
+5. SOLUCIÓN DEL MODELO
+Estado de la solución: Optimal
+
+Valores óptimos encontrados:
+X1 (Sillas) = 20
+X2 (Mesas)  = 10
+
+Utilidad máxima:
+Z = 1100
+
+============================================================
+
+6. VERIFICACIÓN DE RESTRICCIONES
+Tiempo usado: 2(20) + 5(10) = 90 <= 100
+Material usado: 1(20) + 3(10) = 50 <= 60
+Demanda sillas: 20 <= 20
+Demanda mesas: 10 <= 10
+
+7. RESPUESTA FINAL
+La fábrica debe producir 20 sillas y 10 mesas por día.
+La utilidad máxima que obtiene es de 1100.
+
+
+ejercicio #2:
+2) VARIABLES DE DECISIÓN
+x11 = GHz del servidor S1 asignados a la aplicación A1
+x12 = GHz del servidor S1 asignados a la aplicación A2
+x13 = GHz del servidor S1 asignados a la aplicación A3
+x14 = GHz del servidor S1 asignados a la aplicación A4
+
+x21 = GHz del servidor S2 asignados a la aplicación A1
+x22 = GHz del servidor S2 asignados a la aplicación A2
+x23 = GHz del servidor S2 asignados a la aplicación A3
+x24 = GHz del servidor S2 asignados a la aplicación A4
+
+x31 = GHz del servidor S3 asignados a la aplicación A1
+x32 = GHz del servidor S3 asignados a la aplicación A2
+x33 = GHz del servidor S3 asignados a la aplicación A3
+x34 = GHz del servidor S3 asignados a la aplicación A4
+
+3) FUNCIÓN OBJETIVO
+Min Z = 0.5x11 + 0.5x12 + 0.5x13 + 0.5x14
+      + 0.4x21 + 0.4x22 + 0.4x23 + 0.4x24
+      + 0.3x31 + 0.3x32 + 0.3x33 + 0.3x34
+
+4) RESTRICCIONES
+Capacidad de los servidores:
+x11 + x12 + x13 + x14 <= 100
+x21 + x22 + x23 + x24 <= 150
+x31 + x32 + x33 + x34 <= 200
+
+Requerimiento de las aplicaciones:
+x11 + x21 + x31 = 50
+x12 + x22 + x32 = 60
+x13 + x23 + x33 = 80
+x14 + x24 + x34 = 70
+
+No negatividad:
+xij >= 0
+
+5) SOLUCIÓN
+Estado de la solución: Optimal
+
+Valores óptimos de las variables:
+x11 = 0.0
+x12 = 0.0
+x13 = 0.0
+x14 = 0.0
+
+x21 = 0.0
+x22 = 0.0
+x23 = 60.0
+x24 = 0.0
+
+x31 = 50.0
+x32 = 60.0
+x33 = 20.0
+x34 = 70.0
+
+Consumo mínimo total de energía:
+Z = 84.0 W
+
+Uso total de cada servidor:
+S1 = 0.0 GHz de 100 GHz
+S2 = 60.0 GHz de 150 GHz
+S3 = 200.0 GHz de 200 GHz
+
+Procesamiento total asignado a cada aplicación:
+A1 = 50.0 GHz
+A2 = 60.0 GHz
+A3 = 80.0 GHz
+A4 = 70.0 GHz
+
+Interpretación de la solución:
+La solución óptima asigna primero la mayor cantidad posible al servidor S3
+porque tiene el menor consumo por GHz, luego al servidor S2 y por último a S1 si es necesario.
+
+
+ejercicio #3:
+2) VARIABLES DE DECISIÓN
+xij = unidades enviadas desde la bodega i al cliente j
+yA = 1 si se abre la Bodega A, 0 en caso contrario
+yB = 1 si se abre la Bodega B, 0 en caso contrario
+
+xA1 = unidades enviadas desde A al Cliente 1
+xA2 = unidades enviadas desde A al Cliente 2
+xA3 = unidades enviadas desde A al Cliente 3
+xB1 = unidades enviadas desde B al Cliente 1
+xB2 = unidades enviadas desde B al Cliente 2
+xB3 = unidades enviadas desde B al Cliente 3
+
+3) FUNCIÓN OBJETIVO
+Min Z = 500yA + 400yB + 4xA1 + 6xA2 + 9xA3 + 5xB1 + 4xB2 + 7xB3
+
+4) RESTRICCIONES
+Demanda de los clientes:
+xA1 + xB1 = 80
+xA2 + xB2 = 70
+xA3 + xB3 = 60
+
+Capacidad de las bodegas:
+xA1 + xA2 + xA3 <= 150yA
+xB1 + xB2 + xB3 <= 120yB
+
+No negatividad:
+xij >= 0
+
+Variables binarias:
+yA, yB = 0 o 1
+
+5) SOLUCIÓN
+Estado de la solución: Optimal
+
+Valores óptimos de las variables:
+xA1 = 80.0
+xA2 = 0.0
+xA3 = 10.0
+
+xB1 = 0.0
+xB2 = 70.0
+xB3 = 50.0
+
+yA = 1.0
+yB = 1.0
+
+Costo mínimo total:
+Z = 1940.0
+
+Uso total de cada bodega:
+Bodega A = 90.0 unidades de 150
+Bodega B = 120.0 unidades de 120
+
+Demanda satisfecha de cada cliente:
+Cliente 1 = 80.0 unidades
+Cliente 2 = 70.0 unidades
+Cliente 3 = 60.0 unidades
+
+Interpretación de la solución:
+Se abre la Bodega A
+Se abre la Bodega B
+
+Enviar 80.0 unidades desde A al Cliente 1
+Enviar 0.0 unidades desde A al Cliente 2
+Enviar 10.0 unidades desde A al Cliente 3
+Enviar 0.0 unidades desde B al Cliente 1
+Enviar 70.0 unidades desde B al Cliente 2
+Enviar 50.0 unidades desde B al Cliente 3
+
+
+ejercicio #4:
+2) VARIABLES DE DECISIÓN
+xij = unidades del producto j producidas en la planta i
+y1 = 1 si se abre Planta 1
+y2 = 1 si se abre Planta 2
+
+3) FUNCIÓN OBJETIVO
+Max Z = 30x1A + 40x1B + 30x2A + 40x2B - 600y1 - 500y2
+
+4) RESTRICCIONES
+Mano de obra:
+3x1A + 2x1B + 3x2A + 2x2B <= 200
+
+Materia prima:
+2x1A + 3x1B + 2x2A + 3x2B <= 150
+
+Capacidad por planta:
+x1A + x1B <= 80y1
+x2A + x2B <= 100y2
+
+Demanda mínima:
+x1A + x2A >= 40
+x1B + x2B >= 30
+
+No negatividad y binarias
+xij >= 0, yi = 0 o 1
+
+5) SOLUCIÓN
+Estado: Infeasible
+
+Variables óptimas:
+x1A = 0.0
+x1B = 0.0
+x2A = 30.0
+x2B = 30.0
+
+y1 (Planta 1) = 0.0
+y2 (Planta 2) = 0.6
+
+Ganancia máxima:
+Z = 1800.0
+
+Uso de recursos:
+Mano de obra usada = 150.0 de 200
+Materia prima usada = 150.0 de 150
+
+Producción total:
+Producto A = 30.0
+Producto B = 30.0
+
+Capacidad utilizada:
+Planta 1 = 0.0 de 80
+Planta 2 = 60.0 de 100
+
+Interpretación:
+No se abre Planta 1
+No se abre Planta 2
+
+
+ejercicio #5:
+2) VARIABLES DE DECISIÓN
+xhb = 1 si la bomba b opera en la hora h
+nh = nivel del tanque al final de la hora h
+
+3) FUNCIÓN OBJETIVO
+Min Z =
+0.0244(x01 + x02 + x03 + x04) +
+0.0244(x11 + x12 + x13 + x14) +
+0.0244(x21 + x22 + x23 + x24) +
+0.0244(x31 + x32 + x33 + x34) +
+0.0244(x41 + x42 + x43 + x44) +
+0.0244(x51 + x52 + x53 + x54) +
+0.0244(x61 + x62 + x63 + x64) +
+0.0244(x71 + x72 + x73 + x74) +
+0.1194(x81 + x82 + x83 + x84) +
+0.1194(x91 + x92 + x93 + x94) +
+0.1194(x101 + x102 + x103 + x104) +
+0.1194(x111 + x112 + x113 + x114) +
+0.1194(x121 + x122 + x123 + x124) +
+0.1194(x131 + x132 + x133 + x134) +
+0.1194(x141 + x142 + x143 + x144) +
+0.1194(x151 + x152 + x153 + x154) +
+0.1194(x161 + x162 + x163 + x164) +
+0.1194(x171 + x172 + x173 + x174) +
+0.1194(x181 + x182 + x183 + x184) +
+0.1194(x191 + x192 + x193 + x194) +
+0.1194(x201 + x202 + x203 + x204) +
+0.1194(x211 + x212 + x213 + x214) +
+0.1194(x221 + x222 + x223 + x224) +
+0.1194(x231 + x232 + x233 + x234)
+
+4) RESTRICCIONES
+Balance del tanque:
+nivel0 = 70 + 10(x01 + x02 + x03 + x04) - 40
+nivel1 = nivel0 + 10(x11 + x12 + x13 + x14) - 40
+nivel2 = nivel1 + 10(x21 + x22 + x23 + x24) - 40
+nivel3 = nivel2 + 10(x31 + x32 + x33 + x34) - 40
+nivel4 = nivel3 + 10(x41 + x42 + x43 + x44) - 45
+nivel5 = nivel4 + 10(x51 + x52 + x53 + x54) - 50
+nivel6 = nivel5 + 10(x61 + x62 + x63 + x64) - 60
+nivel7 = nivel6 + 10(x71 + x72 + x73 + x74) - 70
+nivel8 = nivel7 + 10(x81 + x82 + x83 + x84) - 80
+nivel9 = nivel8 + 10(x91 + x92 + x93 + x94) - 90
+nivel10 = nivel9 + 10(x101 + x102 + x103 + x104) - 90
+nivel11 = nivel10 + 10(x111 + x112 + x113 + x114) - 85
+nivel12 = nivel11 + 10(x121 + x122 + x123 + x124) - 70
+nivel13 = nivel12 + 10(x131 + x132 + x133 + x134) - 60
+nivel14 = nivel13 + 10(x141 + x142 + x143 + x144) - 55
+nivel15 = nivel14 + 10(x151 + x152 + x153 + x154) - 60
+nivel16 = nivel15 + 10(x161 + x162 + x163 + x164) - 65
+nivel17 = nivel16 + 10(x171 + x172 + x173 + x174) - 75
+nivel18 = nivel17 + 10(x181 + x182 + x183 + x184) - 85
+nivel19 = nivel18 + 10(x191 + x192 + x193 + x194) - 90
+nivel20 = nivel19 + 10(x201 + x202 + x203 + x204) - 90
+nivel21 = nivel20 + 10(x211 + x212 + x213 + x214) - 80
+nivel22 = nivel21 + 10(x221 + x222 + x223 + x224) - 60
+nivel23 = nivel22 + 10(x231 + x232 + x233 + x234) - 50
+
+Presión mínima simplificada:
+10(x01 + x02 + x03 + x04) >= 16.0
+10(x11 + x12 + x13 + x14) >= 16.0
+10(x21 + x22 + x23 + x24) >= 16.0
+10(x31 + x32 + x33 + x34) >= 16.0
+10(x41 + x42 + x43 + x44) >= 18.0
+10(x51 + x52 + x53 + x54) >= 20.0
+10(x61 + x62 + x63 + x64) >= 24.0
+10(x71 + x72 + x73 + x74) >= 28.0
+10(x81 + x82 + x83 + x84) >= 32.0
+10(x91 + x92 + x93 + x94) >= 36.0
+10(x101 + x102 + x103 + x104) >= 36.0
+10(x111 + x112 + x113 + x114) >= 34.0
+10(x121 + x122 + x123 + x124) >= 28.0
+10(x131 + x132 + x133 + x134) >= 24.0
+10(x141 + x142 + x143 + x144) >= 22.0
+10(x151 + x152 + x153 + x154) >= 24.0
+10(x161 + x162 + x163 + x164) >= 26.0
+10(x171 + x172 + x173 + x174) >= 30.0
+10(x181 + x182 + x183 + x184) >= 34.0
+10(x191 + x192 + x193 + x194) >= 36.0
+10(x201 + x202 + x203 + x204) >= 36.0
+10(x211 + x212 + x213 + x214) >= 32.0
+10(x221 + x222 + x223 + x224) >= 24.0
+10(x231 + x232 + x233 + x234) >= 20.0
+
+Máximo de bombas por hora:
+x01 + x02 + x03 + x04 <= 4
+x11 + x12 + x13 + x14 <= 4
+x21 + x22 + x23 + x24 <= 4
+x31 + x32 + x33 + x34 <= 4
+x41 + x42 + x43 + x44 <= 4
+x51 + x52 + x53 + x54 <= 4
+x61 + x62 + x63 + x64 <= 4
+x71 + x72 + x73 + x74 <= 4
+x81 + x82 + x83 + x84 <= 4
+x91 + x92 + x93 + x94 <= 4
+x101 + x102 + x103 + x104 <= 4
+x111 + x112 + x113 + x114 <= 4
+x121 + x122 + x123 + x124 <= 4
+x131 + x132 + x133 + x134 <= 4
+x141 + x142 + x143 + x144 <= 4
+x151 + x152 + x153 + x154 <= 4
+x161 + x162 + x163 + x164 <= 4
+x171 + x172 + x173 + x174 <= 4
+x181 + x182 + x183 + x184 <= 4
+x191 + x192 + x193 + x194 <= 4
+x201 + x202 + x203 + x204 <= 4
+x211 + x212 + x213 + x214 <= 4
+x221 + x222 + x223 + x224 <= 4
+x231 + x232 + x233 + x234 <= 4
+
+Límites del tanque:
+67.67 <= nivel0 <= 76.2
+67.67 <= nivel1 <= 76.2
+67.67 <= nivel2 <= 76.2
+67.67 <= nivel3 <= 76.2
+67.67 <= nivel4 <= 76.2
+67.67 <= nivel5 <= 76.2
+67.67 <= nivel6 <= 76.2
+67.67 <= nivel7 <= 76.2
+67.67 <= nivel8 <= 76.2
+67.67 <= nivel9 <= 76.2
+67.67 <= nivel10 <= 76.2
+67.67 <= nivel11 <= 76.2
+67.67 <= nivel12 <= 76.2
+67.67 <= nivel13 <= 76.2
+67.67 <= nivel14 <= 76.2
+67.67 <= nivel15 <= 76.2
+67.67 <= nivel16 <= 76.2
+67.67 <= nivel17 <= 76.2
+67.67 <= nivel18 <= 76.2
+67.67 <= nivel19 <= 76.2
+67.67 <= nivel20 <= 76.2
+67.67 <= nivel21 <= 76.2
+67.67 <= nivel22 <= 76.2
+67.67 <= nivel23 <= 76.2
+
+Variables binarias:
+xhb = 0 o 1
+
+5) SOLUCIÓN
+Estado: Infeasible
+
+Costo mínimo total:
+Z = 8.930403600000004
+
+Operación de bombas por hora:
+Hora 0:
+x01 = 0.0
+x02 = 0.0
+x03 = 0.0
+x04 = 0.0
+Bombas encendidas = 0.0
+
+Hora 1:
+x11 = 0.0
+x12 = 0.0
+x13 = 0.0
+x14 = 0.0
+Bombas encendidas = 0.0
+
+Hora 2:
+x21 = 0.0
+x22 = 0.0
+x23 = 0.0
+x24 = 0.0
+Bombas encendidas = 0.0
+
+Hora 3:
+x31 = 0.0
+x32 = 0.0
+x33 = 0.0
+x34 = 0.0
+Bombas encendidas = 0.0
+
+Hora 4:
+x41 = 0.0
+x42 = 0.0
+x43 = 0.0
+x44 = 0.0
+Bombas encendidas = 0.0
+
+Hora 5:
+x51 = 0.0
+x52 = 0.0
+x53 = 0.0
+x54 = 0.0
+Bombas encendidas = 0.0
+
+Hora 6:
+x61 = 0.0
+x62 = 0.0
+x63 = 0.0
+x64 = 0.0
+Bombas encendidas = 0.0
+
+Hora 7:
+x71 = 0.0
+x72 = 0.0
+x73 = 0.0
+x74 = 0.0
+Bombas encendidas = 0.0
+
+Hora 8:
+x81 = 1.0
+x82 = 18.647
+x83 = 1.0
+x84 = 1.0
+Bombas encendidas = 21.647
+
+Hora 9:
+x91 = 1.0
+x92 = 1.0
+x93 = 1.0
+x94 = 1.0
+Bombas encendidas = 4.0
+
+Hora 10:
+x101 = 1.0
+x102 = 1.0
+x103 = 1.0
+x104 = 1.0
+Bombas encendidas = 4.0
+
+Hora 11:
+x111 = 1.0
+x112 = 1.0
+x113 = 1.0
+x114 = 1.0
+Bombas encendidas = 4.0
+
+Hora 12:
+x121 = 0.0
+x122 = 0.0
+x123 = 0.0
+x124 = 0.0
+Bombas encendidas = 0.0
+
+Hora 13:
+x131 = 0.0
+x132 = 0.0
+x133 = 0.0
+x134 = 0.0
+Bombas encendidas = 0.0
+
+Hora 14:
+x141 = 0.0
+x142 = 0.0
+x143 = 0.0
+x144 = 0.0
+Bombas encendidas = 0.0
+
+Hora 15:
+x151 = 0.0
+x152 = 0.0
+x153 = 0.0
+x154 = 0.0
+Bombas encendidas = 0.0
+
+Hora 16:
+x161 = 0.0
+x162 = 0.0
+x163 = 0.0
+x164 = 0.0
+Bombas encendidas = 0.0
+
+Hora 17:
+x171 = 1.0
+x172 = 1.0
+x173 = 1.0
+x174 = 22.147
+Bombas encendidas = 25.147
+
+Hora 18:
+x181 = 1.0
+x182 = 1.0
+x183 = 1.0
+x184 = 1.0
+Bombas encendidas = 4.0
+
+Hora 19:
+x191 = 1.0
+x192 = 1.0
+x193 = 1.0
+x194 = 1.0
+Bombas encendidas = 4.0
+
+Hora 20:
+x201 = 1.0
+x202 = 1.0
+x203 = 1.0
+x204 = 1.0
+Bombas encendidas = 4.0
+
+Hora 21:
+x211 = 1.0
+x212 = 1.0
+x213 = 1.0
+x214 = 1.0
+Bombas encendidas = 4.0
+
+Hora 22:
+x221 = 0.0
+x222 = 0.0
+x223 = 0.0
+x224 = 0.0
+Bombas encendidas = 0.0
+
+Hora 23:
+x231 = 0.0
+x232 = 0.0
+x233 = 0.0
+x234 = 0.0
+Bombas encendidas = 0.0
+
+Nivel del tanque por hora:
+nivel0 = 67.67
+nivel1 = 67.67
+nivel2 = 67.67
+nivel3 = 67.67
+nivel4 = 67.67
+nivel5 = 67.67
+nivel6 = 67.67
+nivel7 = 76.2
+nivel8 = 212.67
+nivel9 = 162.67
+nivel10 = 112.67
+nivel11 = 67.67
+nivel12 = 67.67
+nivel13 = 67.67
+nivel14 = 67.67
+nivel15 = 67.67
+nivel16 = 76.2
+nivel17 = 252.67
+nivel18 = 207.67
+nivel19 = 157.67
+nivel20 = 107.67
+nivel21 = 67.67
+nivel22 = 67.67
+nivel23 = 67.67
+
+Verificación de presión mínima simplificada:
+Hora 0: 0.0 >= 16.0
+Hora 1: 0.0 >= 16.0
+Hora 2: 0.0 >= 16.0
+Hora 3: 0.0 >= 16.0
+Hora 4: 0.0 >= 18.0
+Hora 5: 0.0 >= 20.0
+Hora 6: 0.0 >= 24.0
+Hora 7: 0.0 >= 28.0
+Hora 8: 216.46999999999997 >= 32.0
+Hora 9: 40.0 >= 36.0
+Hora 10: 40.0 >= 36.0
+Hora 11: 40.0 >= 34.0
+Hora 12: 0.0 >= 28.0
+Hora 13: 0.0 >= 24.0
+Hora 14: 0.0 >= 22.0
+Hora 15: 0.0 >= 24.0
+Hora 16: 0.0 >= 26.0
+Hora 17: 251.46999999999997 >= 30.0
+Hora 18: 40.0 >= 34.0
+Hora 19: 40.0 >= 36.0
+Hora 20: 40.0 >= 36.0
+Hora 21: 40.0 >= 32.0
+Hora 22: 0.0 >= 24.0
+Hora 23: 0.0 >= 20.0
+
+Interpretación:
+El modelo selecciona qué bombas activar en cada hora del día
+para minimizar el costo total de energía, respetando el balance
+del tanque, el nivel permitido y la presión mínima simplificada.
+
+
+ejercicio #6:
+2) VARIABLES DE DECISIÓN
+xpt = cantidad producida del producto p en el período t
+epbt = cantidad enviada del producto p a la bodega b en el período t
+ipbt = inventario del producto p en la bodega b al final del período t
+ypt = 1 si se activa la producción del producto p en el período t
+
+3) FUNCIÓN OBJETIVO
+Min Z = 5x11 + 6x12 + 5x13 + 4x21 + 5x22 + 6x23
+      + 3e111 + 3e112 + 3e113 + 4e121 + 4e122 + 4e123
+      + 2e211 + 2e212 + 2e213 + 3e221 + 3e222 + 3e223
+      + 1i111 + 1i112 + 1i113 + 2i121 + 2i122 + 2i123
+      + 1i211 + 1i212 + 1i213 + 2i221 + 2i222 + 2i223
+
+4) RESTRICCIONES
+Capacidad de producción por período:
+x11 + x21 <= 100
+x12 + x22 <= 100
+x13 + x23 <= 100
+
+Activación de producción:
+x11 <= 100y11
+x12 <= 100y12
+x13 <= 100y13
+x21 <= 100y21
+x22 <= 100y22
+x23 <= 100y23
+
+Balance producción - envíos:
+x11 = e111 + e121
+x12 = e112 + e122
+x13 = e113 + e123
+x21 = e211 + e221
+x22 = e212 + e222
+x23 = e213 + e223
+
+Balance de inventarios:
+e111 - 20 = i111
+i111 + e112 - 15 = i112
+i112 + e113 - 10 = i113
+
+e121 - 10 = i121
+i121 + e122 - 15 = i122
+i122 + e123 - 20 = i123
+
+e211 - 10 = i211
+i211 + e212 - 20 = i212
+i212 + e213 - 15 = i213
+
+e221 - 15 = i221
+i221 + e222 - 10 = i222
+i222 + e223 - 15 = i223
+
+No negatividad y binarias:
+xpt >= 0, epbt >= 0, ipbt >= 0, ypt = 0 o 1
+
+5) SOLUCIÓN
+Estado: Optimal
+
+Producción óptima:
+x11 = 45.0
+x12 = 15.0
+x13 = 30.0
+x21 = 45.0
+x22 = 10.0
+x23 = 30.0
+
+Envíos óptimos:
+e111 = 35.0
+e112 = 0.0
+e113 = 10.0
+e121 = 10.0
+e122 = 15.0
+e123 = 20.0
+e211 = 30.0
+e212 = 0.0
+e213 = 15.0
+e221 = 15.0
+e222 = 10.0
+e223 = 15.0
+
+Inventarios óptimos:
+i111 = 15.0
+i112 = 0.0
+i113 = 0.0
+i121 = 0.0
+i122 = 0.0
+i123 = 0.0
+i211 = 20.0
+i212 = 0.0
+i213 = 0.0
+i221 = 0.0
+i222 = 0.0
+i223 = 0.0
+
+Activación de producción:
+y11 = 1.0
+y12 = 1.0
+y13 = 1.0
+y21 = 1.0
+y22 = 1.0
+y23 = 1.0
+
+Costo mínimo total:
+Z = 1435.0
+
+Verificación de capacidad por período:
+t1 = 90.0 de 100
+t2 = 25.0 de 100
+t3 = 60.0 de 100
+
+Demanda satisfecha por período:
+P1-B1: t1=35.0, t2=15.0, t3=10.0
+P1-B2: t1=10.0, t2=15.0, t3=20.0
+P2-B1: t1=30.0, t2=20.0, t3=15.0
+P2-B2: t1=15.0, t2=10.0, t3=15.0
+
+Interpretación:
+El modelo determina la cantidad óptima a producir de cada producto en cada período,
+la cantidad que debe enviarse a cada bodega y el inventario que conviene mantener
+al final de cada período, con el fin de minimizar el costo total del sistema.
+
+Además, las variables binarias de activación indican en qué períodos conviene
+habilitar la producción de cada producto. Si una variable ypt toma valor 1,
+significa que en ese período sí se produce el producto correspondiente;
+si toma valor 0, significa que no se activa su producción.
+
+La solución obtenida cumple simultáneamente con:
+- La capacidad máxima de producción en cada período.
+- El balance entre producción y envíos.
+- El balance de inventarios en cada bodega.
+- La satisfacción de la demanda en todos los períodos.
+
+En conclusión, el modelo encuentra un plan de producción, distribución
+e inventario que satisface todas las necesidades de las bodegas al menor
+costo posible, aprovechando cuándo producir, cuánto enviar y cuánto almacenar.
+
+
