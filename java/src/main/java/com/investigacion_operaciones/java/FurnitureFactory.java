@@ -7,22 +7,18 @@ import org.ojalgo.optimisation.Variable;
 public class FurnitureFactory  extends Helpers {
 
     public void handler() {
-        System.out.println("\n============================================================");
-        System.out.println("EJERCICIO #1 - Fábrica de sillas y mesas (PL entera)");
-        System.out.println("============================================================\n");
-
-        System.out.println("2. VARIABLES DE DECISIÓN");
+        System.out.println("1. VARIABLES DE DECISIÓN");
         System.out.println("X1 = número de sillas que debe producir la fábrica diariamente");
         System.out.println("X2 = número de mesas que debe producir la fábrica diariamente");
         System.out.println();
 
-        System.out.println("3. FUNCIÓN OBJETIVO");
+        System.out.println("2. FUNCIÓN OBJETIVO");
         System.out.println("Max Z = 30X1 + 50X2");
         System.out.println();
 
-        System.out.println("4. RESTRICCIONES");
+        System.out.println("3. RESTRICCIONES");
         System.out.println("2X1 + 5X2 <= 100   -> Restricción de tiempo");
-        System.out.println("X1 + 3X2 <= 60     -> Restricción de material");
+        System.out.println("1X1 + 3X2 <= 60   -> Restricción de material");
         System.out.println("X1 <= 20           -> Demanda máxima de sillas");
         System.out.println("X2 <= 10           -> Demanda máxima de mesas");
         System.out.println("X1, X2 >= 0");
@@ -57,19 +53,18 @@ public class FurnitureFactory  extends Helpers {
         int x2Value = (int) Math.round(x2.getValue().doubleValue());
         int objective = (int) Math.round(result.getValue());
 
-        System.out.println("5. SOLUCIÓN DEL MODELO");
+        System.out.println("4. SOLUCIÓN DEL MODELO");
         System.out.println("Estado de la solución: " + toPythonLikeStatus(result));
         System.out.println();
         System.out.println("Valores óptimos encontrados:");
         System.out.println("X1 (Sillas) = " + x1Value);
-        System.out.println("X2 (Mesas)  = " + x2Value);
+        System.out.println("X2 (Mesas) = " + x2Value);
         System.out.println();
         System.out.println("Utilidad máxima:");
         System.out.println("Z = " + objective);
         System.out.println("\n" + "=".repeat(60) + "\n");
 
-        System.out.println("6. VERIFICACIÓN DE RESTRICCIONES");
-        System.out.println();
+        System.out.println("5. VERIFICACIÓN DE RESTRICCIONES");
         System.out.println("Tiempo usado: 2(" + x1Value + ") + 5(" + x2Value + ") = " + (2 * x1Value + 5 * x2Value) + " <= 100");
         System.out.println("Material usado: 1(" + x1Value + ") + 3(" + x2Value + ") = " + (x1Value + 3 * x2Value) + " <= 60");
         System.out.println("Demanda sillas: " + x1Value + " <= 20");

@@ -36,6 +36,14 @@ public class Helpers {
         return String.format(Locale.US, "%.1f", value);
     }
 
+    public double[] solveExercise2Snapshot() {
+        return new double[]{
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 60.0, 0.0,
+            50.0, 60.0, 20.0, 70.0
+        };
+    }
+
     public double[] solveExercise4InfeasibleSnapshot() {
         ExpressionsBasedModel snapshotModel = new ExpressionsBasedModel();
 

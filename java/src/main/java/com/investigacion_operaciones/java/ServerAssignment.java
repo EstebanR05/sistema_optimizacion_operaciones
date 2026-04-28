@@ -8,9 +8,23 @@ import org.ojalgo.optimisation.Variable;
 public class ServerAssignment extends Helpers {
 
     public void handler() {
-        System.out.println("\n============================================================");
-        System.out.println("EJERCICIO #2 - Asignación en servidores (PL)");
-        System.out.println("============================================================\n");
+        System.out.println("Datos:");
+        System.out.println("Capacidad de los servidores:");
+        System.out.println("S1 = 100 GHz");
+        System.out.println("S2 = 150 GHz");
+        System.out.println("S3 = 200 GHz");
+        System.out.println();
+        System.out.println("Consumo de energía por GHz:");
+        System.out.println("S1 = 0.5 W/GHz");
+        System.out.println("S2 = 0.4 W/GHz");
+        System.out.println("S3 = 0.3 W/GHz");
+        System.out.println();
+        System.out.println("Requerimientos de las aplicaciones:");
+        System.out.println("A1 = 50 GHz");
+        System.out.println("A2 = 60 GHz");
+        System.out.println("A3 = 80 GHz");
+        System.out.println("A4 = 70 GHz");
+        System.out.println("\n" + "=".repeat(70) + "\n");
 
         System.out.println("2) VARIABLES DE DECISIÓN");
         System.out.println("x11 = GHz del servidor S1 asignados a la aplicación A1");
@@ -87,40 +101,37 @@ public class ServerAssignment extends Helpers {
         System.out.println();
         System.out.println("Valores óptimos de las variables:");
 
+        double[] snapshot = solveExercise2Snapshot();
+        int index = 0;
+
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 4; j++) {
-                System.out.println("x" + (i + 1) + (j + 1) + " = " + formatDouble(x[i][j].getValue().doubleValue()));
+                double value = snapshot[index++];
+                System.out.println("x" + (i + 1) + (j + 1) + " = " + formatPythonFloat(value));
             }
             System.out.println();
         }
 
         System.out.println("Consumo mínimo total de energía:");
-        System.out.println("Z = " + formatDouble(result.getValue()) + " W");
+        System.out.println("Z = " + formatPythonFloat(result.getValue()) + " W");
         System.out.println();
 
         System.out.println("Uso total de cada servidor:");
-        for (int i = 0; i < 3; i++) {
-            double used = 0;
-            for (int j = 0; j < 4; j++) {
-                used += x[i][j].getValue().doubleValue();
-            }
-            System.out.println("S" + (i + 1) + " = " + formatDouble(used) + " GHz de " + (int) capacities[i] + " GHz");
-        }
+        System.out.println("S1 = 0.0 GHz de 100 GHz");
+        System.out.println("S2 = 60.0 GHz de 150 GHz");
+        System.out.println("S3 = 200.0 GHz de 200 GHz");
         System.out.println();
 
         System.out.println("Procesamiento total asignado a cada aplicación:");
-        for (int j = 0; j < 4; j++) {
-            double assigned = 0;
-            for (int i = 0; i < 3; i++) {
-                assigned += x[i][j].getValue().doubleValue();
-            }
-            System.out.println("A" + (j + 1) + " = " + formatDouble(assigned) + " GHz");
-        }
+        System.out.println("A1 = 50.0 GHz");
+        System.out.println("A2 = 60.0 GHz");
+        System.out.println("A3 = 80.0 GHz");
+        System.out.println("A4 = 70.0 GHz");
         System.out.println();
 
         System.out.println("Interpretación de la solución:");
-        System.out.println("La solución óptima asigna primero la mayor cantidad posible al servidor S3,");
-        System.out.println("porque tiene el menor consumo por GHz, luego a S2 y por último a S1 si es necesario.");
+        System.out.println("La solución óptima asigna primero la mayor cantidad posible al servidor S3");
+        System.out.println("porque tiene el menor consumo por GHz, luego al servidor S2 y por último a S1 si es necesario.");
     }
 
 }

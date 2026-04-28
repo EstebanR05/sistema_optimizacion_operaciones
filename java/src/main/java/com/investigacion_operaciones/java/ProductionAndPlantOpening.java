@@ -7,17 +7,13 @@ import org.ojalgo.optimisation.Variable;
 public class ProductionAndPlantOpening  extends Helpers {
 
     public void handler() {
-        System.out.println("\n============================================================");
-        System.out.println("EJERCICIO #4 - Producción con apertura de plantas (MILP)");
-        System.out.println("============================================================\n");
-
-        System.out.println("2) VARIABLES DE DECISIÓN");
+        System.out.println("1) VARIABLES DE DECISIÓN");
         System.out.println("xij = unidades del producto j producidas en la planta i");
         System.out.println("y1 = 1 si se abre Planta 1");
         System.out.println("y2 = 1 si se abre Planta 2");
         System.out.println();
 
-        System.out.println("3) FUNCIÓN OBJETIVO");
+        System.out.println("2) FUNCIÓN OBJETIVO");
         System.out.println("Max Z = 30x1A + 40x1B + 30x2A + 40x2B - 600y1 - 500y2");
         System.out.println();
 
@@ -66,7 +62,7 @@ public class ProductionAndPlantOpening  extends Helpers {
                 .set(x2B, 1)
                 .lower(30);
 
-        System.out.println("4) RESTRICCIONES");
+        System.out.println("3) RESTRICCIONES");
         System.out.println("Mano de obra:");
         System.out.println("3x1A + 2x1B + 3x2A + 2x2B <= 200");
         System.out.println();
@@ -87,67 +83,15 @@ public class ProductionAndPlantOpening  extends Helpers {
 
         Optimisation.Result result = model.maximise();
 
-        System.out.println("5) SOLUCIÓN");
+        System.out.println("4) SOLUCIÓN");
         System.out.println("Estado: " + toPythonLikeStatus(result));
         System.out.println();
-
-        double x1AValue = getValueOrZero(x1A);
-        double x1BValue = getValueOrZero(x1B);
-        double x2AValue = getValueOrZero(x2A);
-        double x2BValue = getValueOrZero(x2B);
-        double y1Value = getValueOrZero(y1);
-        double y2Value = getValueOrZero(y2);
-
-        if ("INFEASIBLE".equalsIgnoreCase(String.valueOf(result.getState()))) {
-            double[] snapshot = solveExercise4InfeasibleSnapshot();
-            x1AValue = snapshot[0];
-            x1BValue = snapshot[1];
-            x2AValue = snapshot[2];
-            x2BValue = snapshot[3];
-            y1Value = snapshot[4];
-            y2Value = snapshot[5];
-        }
-
-        System.out.println("Variables óptimas:");
-        System.out.println("x1A = " + formatPythonFloat(x1AValue));
-        System.out.println("x1B = " + formatPythonFloat(x1BValue));
-        System.out.println("x2A = " + formatPythonFloat(x2AValue));
-        System.out.println("x2B = " + formatPythonFloat(x2BValue));
+        System.out.println("El modelo no tiene una solución factible.");
+        System.out.println("No se deben interpretar los valores de las variables como solución óptima.");
         System.out.println();
-        System.out.println("y1 (Planta 1) = " + formatPythonFloat(y1Value));
-        System.out.println("y2 (Planta 2) = " + formatPythonFloat(y2Value));
-        System.out.println();
-
-        System.out.println("Ganancia máxima:");
-        double displayedObjective = 30 * x1AValue + 40 * x1BValue + 30 * x2AValue + 40 * x2BValue - 600 * y1Value - 500 * y2Value;
-        System.out.println("Z = " + formatPythonFloat(displayedObjective));
-        System.out.println();
-
-        double labor = 3 * x1AValue + 2 * x1BValue + 3 * x2AValue + 2 * x2BValue;
-        double material = 2 * x1AValue + 3 * x1BValue + 2 * x2AValue + 3 * x2BValue;
-        double totalA = x1AValue + x2AValue;
-        double totalB = x1BValue + x2BValue;
-        double capP1 = x1AValue + x1BValue;
-        double capP2 = x2AValue + x2BValue;
-
-        System.out.println("Uso de recursos:");
-        System.out.println("Mano de obra usada = " + formatPythonFloat(labor) + " de 200");
-        System.out.println("Materia prima usada = " + formatPythonFloat(material) + " de 150");
-        System.out.println();
-
-        System.out.println("Producción total:");
-        System.out.println("Producto A = " + formatPythonFloat(totalA));
-        System.out.println("Producto B = " + formatPythonFloat(totalB));
-        System.out.println();
-
-        System.out.println("Capacidad utilizada:");
-        System.out.println("Planta 1 = " + formatPythonFloat(capP1) + " de 80");
-        System.out.println("Planta 2 = " + formatPythonFloat(capP2) + " de 100");
-        System.out.println();
-
-        System.out.println("Interpretación:");
-        System.out.println((Math.abs(y1Value - 1.0) < 1e-9) ? "Se abre Planta 1" : "No se abre Planta 1");
-        System.out.println((Math.abs(y2Value - 1.0) < 1e-9) ? "Se abre Planta 2" : "No se abre Planta 2");
+        System.out.println("Posible causa:");
+        System.out.println("Con los recursos disponibles no se puede cumplir simultáneamente");
+        System.out.println("la demanda mínima de A y B junto con las demás restricciones.");
     }
 
 }

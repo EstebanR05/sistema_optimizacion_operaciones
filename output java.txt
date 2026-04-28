@@ -9,39 +9,33 @@ output java:
 6. ejercicio6
 7. Salir
 Selecciona una opción: 1
-
-============================================================
-EJERCICIO #1 - Fábrica de sillas y mesas (PL entera)
-============================================================
-
-2. VARIABLES DE DECISIÓN
+1. VARIABLES DE DECISIÓN
 X1 = número de sillas que debe producir la fábrica diariamente
 X2 = número de mesas que debe producir la fábrica diariamente
 
-3. FUNCIÓN OBJETIVO
+2. FUNCIÓN OBJETIVO
 Max Z = 30X1 + 50X2
 
-4. RESTRICCIONES
+3. RESTRICCIONES
 2X1 + 5X2 <= 100   -> Restricción de tiempo
-X1 + 3X2 <= 60     -> Restricción de material
+1X1 + 3X2 <= 60   -> Restricción de material
 X1 <= 20           -> Demanda máxima de sillas
 X2 <= 10           -> Demanda máxima de mesas
 X1, X2 >= 0
 
-5. SOLUCIÓN DEL MODELO
+4. SOLUCIÓN DEL MODELO
 Estado de la solución: Optimal
 
 Valores óptimos encontrados:
 X1 (Sillas) = 20
-X2 (Mesas)  = 10
+X2 (Mesas) = 10
 
 Utilidad máxima:
 Z = 1100
 
 ============================================================
 
-6. VERIFICACIÓN DE RESTRICCIONES
-
+5. VERIFICACIÓN DE RESTRICCIONES
 Tiempo usado: 2(20) + 5(10) = 90 <= 100
 Material usado: 1(20) + 3(10) = 50 <= 60
 Demanda sillas: 20 <= 20
@@ -60,10 +54,24 @@ La utilidad máxima que obtiene es de 1100.
 6. ejercicio6
 7. Salir
 Selecciona una opción: 2
+Datos:
+Capacidad de los servidores:
+S1 = 100 GHz
+S2 = 150 GHz
+S3 = 200 GHz
 
-============================================================
-EJERCICIO #2 - Asignación en servidores (PL)
-============================================================
+Consumo de energía por GHz:
+S1 = 0.5 W/GHz
+S2 = 0.4 W/GHz
+S3 = 0.3 W/GHz
+
+Requerimientos de las aplicaciones:
+A1 = 50 GHz
+A2 = 60 GHz
+A3 = 80 GHz
+A4 = 70 GHz
+
+======================================================================
 
 2) VARIABLES DE DECISIÓN
 x11 = GHz del servidor S1 asignados a la aplicación A1
@@ -105,38 +113,38 @@ xij >= 0
 Estado de la solución: Optimal
 
 Valores óptimos de las variables:
-x11 = 0
-x12 = 0
-x13 = 0
-x14 = 0
+x11 = 0.0
+x12 = 0.0
+x13 = 0.0
+x14 = 0.0
 
-x21 = 0
-x22 = 0
-x23 = 0
-x24 = 60
+x21 = 0.0
+x22 = 0.0
+x23 = 60.0
+x24 = 0.0
 
-x31 = 50
-x32 = 60
-x33 = 80
-x34 = 10
+x31 = 50.0
+x32 = 60.0
+x33 = 20.0
+x34 = 70.0
 
 Consumo mínimo total de energía:
-Z = 84 W
+Z = 84.0 W
 
 Uso total de cada servidor:
-S1 = 0 GHz de 100 GHz
-S2 = 60 GHz de 150 GHz
-S3 = 200 GHz de 200 GHz
+S1 = 0.0 GHz de 100 GHz
+S2 = 60.0 GHz de 150 GHz
+S3 = 200.0 GHz de 200 GHz
 
 Procesamiento total asignado a cada aplicación:
-A1 = 50 GHz
-A2 = 60 GHz
-A3 = 80 GHz
-A4 = 70 GHz
+A1 = 50.0 GHz
+A2 = 60.0 GHz
+A3 = 80.0 GHz
+A4 = 70.0 GHz
 
 Interpretación de la solución:
-La solución óptima asigna primero la mayor cantidad posible al servidor S3,
-porque tiene el menor consumo por GHz, luego a S2 y por último a S1 si es necesario.
+La solución óptima asigna primero la mayor cantidad posible al servidor S3
+porque tiene el menor consumo por GHz, luego al servidor S2 y por último a S1 si es necesario.
 
 ===== MENÚ PRINCIPAL =====
 1. ejercicio1
@@ -147,12 +155,7 @@ porque tiene el menor consumo por GHz, luego a S2 y por último a S1 si es neces
 6. ejercicio6
 7. Salir
 Selecciona una opción: 3
-
-============================================================
-EJERCICIO #3 - Apertura de bodegas y transporte (MILP)
-============================================================
-
-2) VARIABLES DE DECISIÓN
+1) VARIABLES DE DECISIÓN
 xij = unidades enviadas desde la bodega i al cliente j
 yA = 1 si se abre la Bodega A, 0 en caso contrario
 yB = 1 si se abre la Bodega B, 0 en caso contrario
@@ -164,10 +167,10 @@ xB1 = unidades enviadas desde B al Cliente 1
 xB2 = unidades enviadas desde B al Cliente 2
 xB3 = unidades enviadas desde B al Cliente 3
 
-3) FUNCIÓN OBJETIVO
+2) FUNCIÓN OBJETIVO
 Min Z = 500yA + 400yB + 4xA1 + 6xA2 + 9xA3 + 5xB1 + 4xB2 + 7xB3
 
-4) RESTRICCIONES
+3) RESTRICCIONES
 Demanda de los clientes:
 xA1 + xB1 = 80
 xA2 + xB2 = 70
@@ -183,43 +186,43 @@ xij >= 0
 Variables binarias:
 yA, yB = 0 o 1
 
-5) SOLUCIÓN
+4) SOLUCIÓN
 Estado de la solución: Optimal
 
 Valores óptimos de las variables:
-xA1 = 80
-xA2 = 0
-xA3 = 10
+xA1 = 80.0
+xA2 = 0.0
+xA3 = 10.0
 
-xB1 = 0
-xB2 = 70
-xB3 = 50
+xB1 = 0.0
+xB2 = 70.0
+xB3 = 50.0
 
-yA = 1
-yB = 1
+yA = 1.0
+yB = 1.0
 
 Costo mínimo total:
-Z = 1940.0000
+Z = 1940.0
 
 Uso total de cada bodega:
-Bodega A = 90 unidades de 150
-Bodega B = 120 unidades de 120
+Bodega A = 90.0 unidades de 150
+Bodega B = 120.0 unidades de 120
 
 Demanda satisfecha de cada cliente:
-Cliente 1 = 80 unidades
-Cliente 2 = 70 unidades
-Cliente 3 = 60 unidades
+Cliente 1 = 80.0 unidades
+Cliente 2 = 70.0 unidades
+Cliente 3 = 60.0 unidades
 
 Interpretación de la solución:
 Se abre la Bodega A
 Se abre la Bodega B
 
-Enviar 80 unidades desde A al Cliente 1
-Enviar 0 unidades desde A al Cliente 2
-Enviar 10 unidades desde A al Cliente 3
-Enviar 0 unidades desde B al Cliente 1
-Enviar 70 unidades desde B al Cliente 2
-Enviar 50 unidades desde B al Cliente 3
+Enviar 80.0 unidades desde A al Cliente 1
+Enviar 0.0 unidades desde A al Cliente 2
+Enviar 10.0 unidades desde A al Cliente 3
+Enviar 0.0 unidades desde B al Cliente 1
+Enviar 70.0 unidades desde B al Cliente 2
+Enviar 50.0 unidades desde B al Cliente 3
 
 ===== MENÚ PRINCIPAL =====
 1. ejercicio1
@@ -230,20 +233,15 @@ Enviar 50 unidades desde B al Cliente 3
 6. ejercicio6
 7. Salir
 Selecciona una opción: 4
-
-============================================================
-EJERCICIO #4 - Producción con apertura de plantas (MILP)
-============================================================
-
-2) VARIABLES DE DECISIÓN
+1) VARIABLES DE DECISIÓN
 xij = unidades del producto j producidas en la planta i
 y1 = 1 si se abre Planta 1
 y2 = 1 si se abre Planta 2
 
-3) FUNCIÓN OBJETIVO
+2) FUNCIÓN OBJETIVO
 Max Z = 30x1A + 40x1B + 30x2A + 40x2B - 600y1 - 500y2
 
-4) RESTRICCIONES
+3) RESTRICCIONES
 Mano de obra:
 3x1A + 2x1B + 3x2A + 2x2B <= 200
 
@@ -261,36 +259,15 @@ x1B + x2B >= 30
 No negatividad y binarias
 xij >= 0, yi = 0 o 1
 
-5) SOLUCIÓN
+4) SOLUCIÓN
 Estado: Infeasible
 
-Variables óptimas:
-x1A = 0.0
-x1B = 0.0
-x2A = 30.0
-x2B = 30.0
+El modelo no tiene una solución factible.
+No se deben interpretar los valores de las variables como solución óptima.
 
-y1 (Planta 1) = 0.0
-y2 (Planta 2) = 0.6
-
-Ganancia máxima:
-Z = 1800.0
-
-Uso de recursos:
-Mano de obra usada = 150.0 de 200
-Materia prima usada = 150.0 de 150
-
-Producción total:
-Producto A = 30.0
-Producto B = 30.0
-
-Capacidad utilizada:
-Planta 1 = 0.0 de 80
-Planta 2 = 60.0 de 100
-
-Interpretación:
-No se abre Planta 1
-No se abre Planta 2
+Posible causa:
+Con los recursos disponibles no se puede cumplir simultáneamente
+la demanda mínima de A y B junto con las demás restricciones.
 
 ===== MENÚ PRINCIPAL =====
 1. ejercicio1
@@ -301,11 +278,6 @@ No se abre Planta 2
 6. ejercicio6
 7. Salir
 Selecciona una opción: 5
-
-============================================================
-EJERCICIO #5 - Operación de bombas (Anytown simplificado)
-============================================================
-
 2) VARIABLES DE DECISIÓN
 xhb = 1 si la bomba b opera en la hora h
 nh = nivel del tanque al final de la hora h
@@ -444,12 +416,6 @@ Límites del tanque:
 
 Variables binarias:
 xhb = 0 o 1
-
-Restricciones incluidas:
-- Balance de tanque por hora
-- Producción mínima (presión)
-- Límite de bombas
-- Nivel del tanque entre límites
 
 5) SOLUCIÓN
 Estado: Infeasible
@@ -692,11 +658,6 @@ del tanque, el nivel permitido y la presión mínima simplificada.
 6. ejercicio6
 7. Salir
 Selecciona una opción: 6
-
-============================================================
-EJERCICIO #6 - Planeación de producción, distribución e inventarios
-============================================================
-
 2) VARIABLES DE DECISIÓN
 xpt = cantidad producida del producto p en el período t
 epbt = cantidad enviada del producto p a la bodega b en el período t

@@ -8,10 +8,6 @@ import org.ojalgo.optimisation.Variable;
 public class PumpOperation extends Helpers {
 
     public void handler() {
-        System.out.println("\n============================================================");
-        System.out.println("EJERCICIO #5 - Operación de bombas (Anytown simplificado)");
-        System.out.println("============================================================\n");
-
         System.out.println("2) VARIABLES DE DECISIÓN");
         System.out.println("xhb = 1 si la bomba b opera en la hora h");
         System.out.println("nh = nivel del tanque al final de la hora h");
@@ -127,13 +123,6 @@ public class PumpOperation extends Helpers {
                 maxBombas.set(x[h][b], 1);
             }
         }
-
-        System.out.println("Restricciones incluidas:");
-        System.out.println("- Balance de tanque por hora");
-        System.out.println("- Producción mínima (presión)");
-        System.out.println("- Límite de bombas");
-        System.out.println("- Nivel del tanque entre límites");
-        System.out.println();
 
         Optimisation.Result result = model.minimise();
 

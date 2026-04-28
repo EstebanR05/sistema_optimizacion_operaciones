@@ -7,10 +7,6 @@ import org.ojalgo.optimisation.Variable;
 public class SupplyPlanning extends Helpers {
 
     public void handler() {
-        System.out.println("\n============================================================");
-        System.out.println("EJERCICIO #6 - Planeación de producción, distribución e inventarios");
-        System.out.println("============================================================\n");
-
         System.out.println("2) VARIABLES DE DECISIÓN");
         System.out.println("xpt = cantidad producida del producto p en el período t");
         System.out.println("epbt = cantidad enviada del producto p a la bodega b en el período t");
