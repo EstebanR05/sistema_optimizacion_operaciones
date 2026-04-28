@@ -1,5 +1,8 @@
 package com.investigacion_operaciones.java;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -9,9 +12,11 @@ public class PumpOperation extends Helpers {
 
     public void handler() {
         System.out.println("2) VARIABLES DE DECISIÓN");
-        System.out.println("xhb = 1 si la bomba b opera en la hora h");
-        System.out.println("nh = nivel del tanque al final de la hora h");
-        System.out.println();
+        printLines(
+            "xhb = 1 si la bomba b opera en la hora h",
+            "nh = nivel del tanque al final de la hora h"
+        );
+        printBlankLine();
 
         final int horas = 24;
         final int bombas = 4;
@@ -27,23 +32,20 @@ public class PumpOperation extends Helpers {
             tarifa[h] = (h >= 8 && h <= 23) ? 0.1194 : 0.0244;
         }
 
-        System.out.println("3) FUNCIÓN OBJETIVO");
+        printSection("3) FUNCIÓN OBJETIVO");
         System.out.println("Min Z =");
         for (int h = 0; h < horas; h++) {
-            String row = tarifa[h] + "(";
+            List<String> pumpTerms = new ArrayList<>();
             for (int b = 0; b < bombas; b++) {
-                row += "x" + h + (b + 1);
-                if (b < bombas - 1) {
-                    row += " + ";
-                }
+                pumpTerms.add("x" + h + (b + 1));
             }
-            row += ")";
+            String row = tarifa[h] + "(" + joinTerms(pumpTerms) + ")";
             if (h < horas - 1) {
                 row += " +";
             }
             System.out.println(row);
         }
-        System.out.println();
+        printBlankLine();
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
@@ -61,36 +63,36 @@ public class PumpOperation extends Helpers {
             nivel[h] = model.newVariable("nivel_" + h).lower(67.67).upper(76.2);
         }
 
-        System.out.println("4) RESTRICCIONES");
-        System.out.println("Balance del tanque:");
+        printSection("4) RESTRICCIONES");
+        printSection("Balance del tanque:");
         System.out.println("nivel0 = " + (int) nivelInicial + " + " + (int) produccionBomba + "(x01 + x02 + x03 + x04) - " + (int) demanda[0]);
         for (int h = 1; h < horas; h++) {
             System.out.println("nivel" + h + " = nivel" + (h - 1) + " + " + (int) produccionBomba
                     + "(x" + h + "1 + x" + h + "2 + x" + h + "3 + x" + h + "4) - " + (int) demanda[h]);
         }
-        System.out.println();
+        printBlankLine();
 
-        System.out.println("Presión mínima simplificada:");
+        printSection("Presión mínima simplificada:");
         for (int h = 0; h < horas; h++) {
             System.out.println((int) produccionBomba + "(x" + h + "1 + x" + h + "2 + x" + h + "3 + x" + h + "4) >= " + (0.4 * demanda[h]));
         }
-        System.out.println();
+        printBlankLine();
 
-        System.out.println("Máximo de bombas por hora:");
+        printSection("Máximo de bombas por hora:");
         for (int h = 0; h < horas; h++) {
             System.out.println("x" + h + "1 + x" + h + "2 + x" + h + "3 + x" + h + "4 <= 4");
         }
-        System.out.println();
+        printBlankLine();
 
-        System.out.println("Límites del tanque:");
+        printSection("Límites del tanque:");
         for (int h = 0; h < horas; h++) {
             System.out.println("67.67 <= nivel" + h + " <= 76.2");
         }
-        System.out.println();
+        printBlankLine();
 
-        System.out.println("Variables binarias:");
+        printSection("Variables binarias:");
         System.out.println("xhb = 0 o 1");
-        System.out.println();
+        printBlankLine();
 
         model.addExpression("Balance_0")
                 .set(nivel[0], 1)
@@ -126,9 +128,9 @@ public class PumpOperation extends Helpers {
 
         Optimisation.Result result = model.minimise();
 
-        System.out.println("5) SOLUCIÓN");
+        printSection("5) SOLUCIÓN");
         System.out.println("Estado: " + toPythonLikeStatus(result));
-        System.out.println();
+        printBlankLine();
 
         double[][] bombaValues = new double[horas][bombas];
         double[] nivelValues = new double[horas];
@@ -147,11 +149,11 @@ public class PumpOperation extends Helpers {
             objectiveValue = solveExercise5InfeasibleObjectiveSnapshot();
         }
 
-        System.out.println("Costo mínimo total:");
+        printSection("Costo mínimo total:");
         System.out.println("Z = " + Double.toString(objectiveValue));
-        System.out.println();
+        printBlankLine();
 
-        System.out.println("Operación de bombas por hora:");
+        printSection("Operación de bombas por hora:");
         for (int h = 0; h < horas; h++) {
             System.out.println("Hora " + h + ":");
             double xh1 = bombaValues[h][0];
@@ -166,13 +168,13 @@ public class PumpOperation extends Helpers {
             System.out.println();
         }
 
-        System.out.println("Nivel del tanque por hora:");
+        printSection("Nivel del tanque por hora:");
         for (int h = 0; h < horas; h++) {
             System.out.println("nivel" + h + " = " + Double.toString(nivelValues[h]));
         }
         System.out.println();
 
-        System.out.println("Verificación de presión mínima simplificada:");
+        printSection("Verificación de presión mínima simplificada:");
         for (int h = 0; h < horas; h++) {
             double prodH = produccionBomba * (bombaValues[h][0] + bombaValues[h][1]
                     + bombaValues[h][2] + bombaValues[h][3]);
@@ -180,9 +182,11 @@ public class PumpOperation extends Helpers {
         }
         System.out.println();
 
-        System.out.println("Interpretación:");
-        System.out.println("El modelo selecciona qué bombas activar en cada hora del día");
-        System.out.println("para minimizar el costo total de energía, respetando el balance");
-        System.out.println("del tanque, el nivel permitido y la presión mínima simplificada.");
+        printSection("Interpretación:");
+        printLines(
+            "El modelo selecciona qué bombas activar en cada hora del día",
+            "para minimizar el costo total de energía, respetando el balance",
+            "del tanque, el nivel permitido y la presión mínima simplificada."
+        );
     }
 }

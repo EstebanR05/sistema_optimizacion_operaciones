@@ -1,6 +1,7 @@
 package com.investigacion_operaciones.java;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Locale;
 
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -8,6 +9,24 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 
 public class Helpers {
+
+    public void printLines(String... lines) {
+        for (String line : lines) {
+            System.out.println(line);
+        }
+    }
+
+    public void printSection(String title) {
+        System.out.println(title);
+    }
+
+    public void printBlankLine() {
+        System.out.println();
+    }
+
+    public String joinTerms(List<String> terms) {
+        return String.join(" + ", terms);
+    }
 
     public String formatDouble(double value) {
         if (Math.abs(value - Math.rint(value)) < 1e-9) {

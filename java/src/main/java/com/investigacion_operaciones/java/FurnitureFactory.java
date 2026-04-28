@@ -1,5 +1,8 @@
 package com.investigacion_operaciones.java;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
@@ -7,72 +10,93 @@ import org.ojalgo.optimisation.Variable;
 public class FurnitureFactory  extends Helpers {
 
     public void handler() {
-        System.out.println("1. VARIABLES DE DECISIÓN");
-        System.out.println("X1 = número de sillas que debe producir la fábrica diariamente");
-        System.out.println("X2 = número de mesas que debe producir la fábrica diariamente");
-        System.out.println();
+        String[] codes = {"X1", "X2"};
+        String[] names = {"Sillas", "Mesas"};
+        String[] descriptions = {
+            "número de sillas que debe producir la fábrica diariamente",
+            "número de mesas que debe producir la fábrica diariamente"
+        };
+        int[] utility = {30, 50};
+        int[] time = {2, 5};
+        int[] material = {1, 3};
+        int[] demand = {20, 10};
 
-        System.out.println("2. FUNCIÓN OBJETIVO");
-        System.out.println("Max Z = 30X1 + 50X2");
-        System.out.println();
+        printSection("1. VARIABLES DE DECISIÓN");
+        for (int i = 0; i < codes.length; i++) {
+            System.out.println(codes[i] + " = " + descriptions[i]);
+        }
+        printBlankLine();
 
-        System.out.println("3. RESTRICCIONES");
-        System.out.println("2X1 + 5X2 <= 100   -> Restricción de tiempo");
-        System.out.println("1X1 + 3X2 <= 60   -> Restricción de material");
-        System.out.println("X1 <= 20           -> Demanda máxima de sillas");
-        System.out.println("X2 <= 10           -> Demanda máxima de mesas");
-        System.out.println("X1, X2 >= 0");
-        System.out.println();
+        List<String> objectiveTerms = new ArrayList<>();
+        for (int i = 0; i < codes.length; i++) {
+            objectiveTerms.add(utility[i] + codes[i]);
+        }
+        printSection("2. FUNCIÓN OBJETIVO");
+        System.out.println("Max Z = " + joinTerms(objectiveTerms));
+        printBlankLine();
+
+        printSection("3. RESTRICCIONES");
+        System.out.println(time[0] + codes[0] + " + " + time[1] + codes[1] + " <= 100   -> Restricción de tiempo");
+        System.out.println(material[0] + codes[0] + " + " + material[1] + codes[1] + " <= 60   -> Restricción de material");
+        for (int i = 0; i < codes.length; i++) {
+            System.out.println(codes[i] + " <= " + demand[i] + "           -> Demanda máxima de " + names[i].toLowerCase());
+        }
+        System.out.println(String.join(", ", codes) + " >= 0");
+        printBlankLine();
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable x1 = model.newVariable("X1_Sillas").lower(0).integer(true).weight(30);
-        Variable x2 = model.newVariable("X2_Mesas").lower(0).integer(true).weight(50);
+        Variable[] variables = new Variable[codes.length];
+        for (int i = 0; i < codes.length; i++) {
+            variables[i] = model.newVariable(codes[i] + "_" + names[i]).lower(0).integer(true).weight(utility[i]);
+        }
 
         model.addExpression("Restriccion_Tiempo")
-                .set(x1, 2)
-                .set(x2, 5)
+                .set(variables[0], time[0])
+                .set(variables[1], time[1])
                 .upper(100);
 
         model.addExpression("Restriccion_Material")
-                .set(x1, 1)
-                .set(x2, 3)
+                .set(variables[0], material[0])
+                .set(variables[1], material[1])
                 .upper(60);
 
-        model.addExpression("Demanda_Sillas")
-                .set(x1, 1)
-                .upper(20);
-
-        model.addExpression("Demanda_Mesas")
-                .set(x2, 1)
-                .upper(10);
+        for (int i = 0; i < codes.length; i++) {
+            model.addExpression("Demanda_" + names[i])
+                    .set(variables[i], 1)
+                    .upper(demand[i]);
+        }
 
         Optimisation.Result result = model.maximise();
 
-        int x1Value = (int) Math.round(x1.getValue().doubleValue());
-        int x2Value = (int) Math.round(x2.getValue().doubleValue());
+        int[] values = new int[codes.length];
+        for (int i = 0; i < codes.length; i++) {
+            values[i] = (int) Math.round(variables[i].getValue().doubleValue());
+        }
         int objective = (int) Math.round(result.getValue());
 
-        System.out.println("4. SOLUCIÓN DEL MODELO");
+        printSection("4. SOLUCIÓN DEL MODELO");
         System.out.println("Estado de la solución: " + toPythonLikeStatus(result));
-        System.out.println();
-        System.out.println("Valores óptimos encontrados:");
-        System.out.println("X1 (Sillas) = " + x1Value);
-        System.out.println("X2 (Mesas) = " + x2Value);
-        System.out.println();
-        System.out.println("Utilidad máxima:");
+        printBlankLine();
+        printSection("Valores óptimos encontrados:");
+        for (int i = 0; i < codes.length; i++) {
+            System.out.println(codes[i] + " (" + names[i] + ") = " + values[i]);
+        }
+        printBlankLine();
+        printSection("Utilidad máxima:");
         System.out.println("Z = " + objective);
         System.out.println("\n" + "=".repeat(60) + "\n");
 
-        System.out.println("5. VERIFICACIÓN DE RESTRICCIONES");
-        System.out.println("Tiempo usado: 2(" + x1Value + ") + 5(" + x2Value + ") = " + (2 * x1Value + 5 * x2Value) + " <= 100");
-        System.out.println("Material usado: 1(" + x1Value + ") + 3(" + x2Value + ") = " + (x1Value + 3 * x2Value) + " <= 60");
-        System.out.println("Demanda sillas: " + x1Value + " <= 20");
-        System.out.println("Demanda mesas: " + x2Value + " <= 10");
-        System.out.println();
+        printSection("5. VERIFICACIÓN DE RESTRICCIONES");
+        System.out.println("Tiempo usado: " + time[0] + "(" + values[0] + ") + " + time[1] + "(" + values[1] + ") = " + (time[0] * values[0] + time[1] * values[1]) + " <= 100");
+        System.out.println("Material usado: " + material[0] + "(" + values[0] + ") + " + material[1] + "(" + values[1] + ") = " + (material[0] * values[0] + material[1] * values[1]) + " <= 60");
+        for (int i = 0; i < codes.length; i++) {
+            System.out.println("Demanda " + names[i].toLowerCase() + ": " + values[i] + " <= " + demand[i]);
+        }
+        printBlankLine();
 
-        System.out.println("7. RESPUESTA FINAL");
-        System.out.println("La fábrica debe producir " + x1Value + " sillas y " + x2Value + " mesas por día.");
+        printSection("7. RESPUESTA FINAL");
+        System.out.println("La fábrica debe producir " + values[0] + " sillas y " + values[1] + " mesas por día.");
         System.out.println("La utilidad máxima que obtiene es de " + objective + ".");
     }
 }

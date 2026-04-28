@@ -1,5 +1,8 @@
 package com.investigacion_operaciones.java;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
@@ -7,15 +10,39 @@ import org.ojalgo.optimisation.Variable;
 public class ProductionAndPlantOpening  extends Helpers {
 
     public void handler() {
-        System.out.println("1) VARIABLES DE DECISIÓN");
-        System.out.println("xij = unidades del producto j producidas en la planta i");
-        System.out.println("y1 = 1 si se abre Planta 1");
-        System.out.println("y2 = 1 si se abre Planta 2");
-        System.out.println();
+        String[] plants = {"1", "2"};
+        int[] capacities = {80, 100};
+        int[] fixedCost = {600, 500};
+        String[] products = {"A", "B"};
+        int[] profits = {30, 40};
+        int[] minDemand = {40, 30};
+        int[][] resources = {
+            {3, 2},
+            {2, 3}
+        };
+        String[] resourceNames = {"Mano de obra", "Materia prima"};
+        int[] resourceLimits = {200, 150};
 
-        System.out.println("2) FUNCIÓN OBJETIVO");
-        System.out.println("Max Z = 30x1A + 40x1B + 30x2A + 40x2B - 600y1 - 500y2");
-        System.out.println();
+        printSection("1) VARIABLES DE DECISIÓN");
+        System.out.println("xij = unidades del producto j producidas en la planta i");
+        for (String plant : plants) {
+            System.out.println("y" + plant + " = 1 si se abre Planta " + plant);
+        }
+        printBlankLine();
+
+        List<String> gainTerms = new ArrayList<>();
+        List<String> costTerms = new ArrayList<>();
+        for (String plant : plants) {
+            for (int j = 0; j < products.length; j++) {
+                gainTerms.add(profits[j] + "x" + plant + products[j]);
+            }
+        }
+        for (int i = 0; i < plants.length; i++) {
+            costTerms.add(fixedCost[i] + "y" + plants[i]);
+        }
+        printSection("2) FUNCIÓN OBJETIVO");
+        System.out.println("Max Z = " + joinTerms(gainTerms) + " - " + String.join(" - ", costTerms));
+        printBlankLine();
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
@@ -62,36 +89,55 @@ public class ProductionAndPlantOpening  extends Helpers {
                 .set(x2B, 1)
                 .lower(30);
 
-        System.out.println("3) RESTRICCIONES");
-        System.out.println("Mano de obra:");
-        System.out.println("3x1A + 2x1B + 3x2A + 2x2B <= 200");
-        System.out.println();
-        System.out.println("Materia prima:");
-        System.out.println("2x1A + 3x1B + 2x2A + 3x2B <= 150");
-        System.out.println();
-        System.out.println("Capacidad por planta:");
-        System.out.println("x1A + x1B <= 80y1");
-        System.out.println("x2A + x2B <= 100y2");
-        System.out.println();
-        System.out.println("Demanda mínima:");
-        System.out.println("x1A + x2A >= 40");
-        System.out.println("x1B + x2B >= 30");
-        System.out.println();
-        System.out.println("No negatividad y binarias");
+        printSection("3) RESTRICCIONES");
+        for (int r = 0; r < resourceNames.length; r++) {
+            List<String> terms = new ArrayList<>();
+            for (String plant : plants) {
+                for (int j = 0; j < products.length; j++) {
+                    terms.add(resources[r][j] + "x" + plant + products[j]);
+                }
+            }
+            System.out.println(resourceNames[r] + ":");
+            System.out.println(joinTerms(terms) + " <= " + resourceLimits[r]);
+            printBlankLine();
+        }
+        printSection("Capacidad por planta:");
+        for (int i = 0; i < plants.length; i++) {
+            List<String> terms = new ArrayList<>();
+            for (String product : products) {
+                terms.add("x" + plants[i] + product);
+            }
+            System.out.println(joinTerms(terms) + " <= " + capacities[i] + "y" + plants[i]);
+        }
+        printBlankLine();
+        printSection("Demanda mínima:");
+        for (int j = 0; j < products.length; j++) {
+            List<String> terms = new ArrayList<>();
+            for (String plant : plants) {
+                terms.add("x" + plant + products[j]);
+            }
+            System.out.println(joinTerms(terms) + " >= " + minDemand[j]);
+        }
+        printBlankLine();
+        printSection("No negatividad y binarias");
         System.out.println("xij >= 0, yi = 0 o 1");
-        System.out.println();
+        printBlankLine();
 
         Optimisation.Result result = model.maximise();
 
-        System.out.println("4) SOLUCIÓN");
+        printSection("4) SOLUCIÓN");
         System.out.println("Estado: " + toPythonLikeStatus(result));
-        System.out.println();
-        System.out.println("El modelo no tiene una solución factible.");
-        System.out.println("No se deben interpretar los valores de las variables como solución óptima.");
-        System.out.println();
-        System.out.println("Posible causa:");
-        System.out.println("Con los recursos disponibles no se puede cumplir simultáneamente");
-        System.out.println("la demanda mínima de A y B junto con las demás restricciones.");
+        printBlankLine();
+        printLines(
+            "El modelo no tiene una solución factible.",
+            "No se deben interpretar los valores de las variables como solución óptima."
+        );
+        printBlankLine();
+        printSection("Posible causa:");
+        printLines(
+            "Con los recursos disponibles no se puede cumplir simultáneamente",
+            "la demanda mínima de A y B junto con las demás restricciones."
+        );
     }
 
 }
