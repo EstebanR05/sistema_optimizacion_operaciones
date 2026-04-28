@@ -82,7 +82,7 @@ En este contexto, no solo resulta importante formular correctamente los modelos,
 
 Con este propósito, se resolvieron seis problemas de optimización de distinta complejidad, implementados en ambas herramientas, con el fin de contrastar resultados, facilidad de desarrollo y aplicabilidad práctica. De esta manera, el estudio no solo muestra el uso de la optimización en escenarios reales, sino que también fortalece el análisis crítico sobre la elección de tecnologías en el ámbito profesional.
 
-\section{Revisión Literatura}
+\section{Revisión de Literatura}
 
 La optimización de sistemas y procesos ha adquirido un papel fundamental en la ingeniería y la investigación operativa, especialmente en contextos donde se busca maximizar la eficiencia en el uso de recursos y mejorar el rendimiento de distintos sistemas. En este sentido, herramientas como la programación lineal y las metaheurísticas han demostrado ser esenciales para abordar problemas complejos en diversos ámbitos.
 
@@ -276,9 +276,9 @@ En conjunto, estos enfoques evidencian la importancia de integrar técnicas mate
 
 \textbf{Nivel de complejidad} Este problema es de nivel medio, ya que involucra decisiones combinadas de producción y apertura de plantas, integrando variables continuas y binarias. Se trata de un modelo de programación entera mixta con múltiples restricciones.
 
-\subsection{Problema 5: Optimización del régimen de bombeo en la red Anytown}
+\subsection{Problema 5: Planificación de inventarios multiproducto y multi-período en farmacia}
 
-\textbf{Contexto real} Este problema se basa en la red hidráulica Anytown, un caso de referencia ampliamente utilizado en el análisis y optimización de sistemas de distribución de agua. Este tipo de sistemas es crítico en la ingeniería civil y ambiental, ya que debe garantizar el suministro adecuado de agua a la población, cumpliendo con restricciones hidráulicas y operativas. La toma de decisiones en este contexto implica determinar el régimen óptimo de operación de bombas para minimizar costos energéticos, considerando variaciones en la demanda y en las tarifas eléctricas a lo largo del día.
+\textbf{Contexto real} Este problema se basa en la gestión de inventarios en una farmacia ubicada en Barranquilla, donde se deben tomar decisiones de abastecimiento a lo largo de varios períodos. El objetivo es garantizar la disponibilidad de medicamentos mientras se minimizan los costos asociados al inventario y a los pedidos. Este tipo de modelos es ampliamente utilizado en cadenas de suministro farmacéuticas, donde existen restricciones de almacenamiento, demanda variable y condiciones operativas específicas.
 
 \textbf{Datos del problema}
 \begin{table}[h]
@@ -287,43 +287,39 @@ En conjunto, estos enfoques evidencian la importancia de integrar técnicas mate
 		\hline
 		\textbf{Concepto} & \textbf{Elemento} & \textbf{Valor} \\
 		\hline
-		Red compuesta por & Infraestructura & 37 tuberías, 18 nodos, 1 tanque y 1 depósito \\
+		Productos & Medicamentos & Tipo A y Tipo B \\
 		\hline
-		Estación de bombeo & Bombas & 4 bombas idénticas de velocidad fija \\
+		Períodos & Horizonte & $t = 1,2,3$ \\
 		\hline
-		Tanque & Elevación & 65,53 m \\
+		Costos de compra (A) & Por período & 10, 12, 11 \\
 		\hline
-		Tanque & Diámetro & 12,2 m \\
+		Costos de compra (B) & Por período & 8, 9, 10 \\
 		\hline
-		Tanque & Nivel mínimo & 67,67 m \\
+		Costos de almacenamiento & Producto A & 2 por unidad \\
 		\hline
-		Tanque & Nivel máximo & 76,2 m \\
+		Costos de almacenamiento & Producto B & 3 por unidad \\
 		\hline
-		Condiciones de operación & Horizonte de tiempo & 24 horas (intervalos de 1 hora) \\
+		Demanda & Producto A & 30, 40, 35 \\
 		\hline
-		Condiciones de operación & Demanda variable & entre 40\% y 120\% de la demanda base \\
+		Demanda & Producto B & 20, 25, 30 \\
 		\hline
-		Condiciones de operación & Picos de demanda & horas 9, 10, 11, 19 y 20 \\
+		Capacidad & Almacenamiento máximo & 100 unidades por período \\
 		\hline
-		Restricciones & Presión mínima en nodos & 15 mca \\
-		\hline
-		Tarifas eléctricas & Rango & 0,0244 a 0,1194 \$/kWh \\
-		\hline
-		Tarifas eléctricas & Tarifa alta & desde las 08:00 hasta las 24:00 \\
+		Inventario inicial & Todos los productos & 0 unidades \\
 		\hline
 	\end{tabular}
 \end{table}
 
 \textbf{Supuestos}
 \begin{itemize}[leftmargin=*]
-	\item Las bombas operan en modo encendido/apagado (variables discretas).
-	\item Las condiciones hidráulicas se modelan de forma determinista y mediante una simplificación lineal discreta por hora.
-	\item No se consideran fallas en el sistema ni pérdidas adicionales.
-	\item El comportamiento de la demanda es conocido y cíclico.
-	\item Cada bomba aporta una producción equivalente constante por hora dentro del modelo implementado.
+	\item La demanda debe satisfacerse completamente en cada período.
+	\item Los productos pueden almacenarse para períodos futuros.
+	\item No hay pérdidas de inventario.
+	\item Los costos son lineales.
+	\item Los pedidos pueden realizarse en cada período.
 \end{itemize}
 
-\textbf{Nivel de complejidad} Este problema es de nivel difícil, ya que combina simulación hidráulica con optimización discreta en un horizonte temporal. Se trata de un problema altamente no lineal y combinatorio, con un número muy elevado de posibles configuraciones de operación.
+\textbf{Nivel de complejidad} Este problema es de nivel alto, ya que integra decisiones interdependientes en múltiples períodos y múltiples productos dentro de un entorno real de cadena de suministro. Su estructura multi-período implica dependencias temporales entre decisiones de inventario y abastecimiento, lo que incrementa significativamente la complejidad del modelo y su resolución.
 
 \subsection{Problema 6: Planificación de producción, distribución e inventarios multi-período}
 
@@ -592,222 +588,73 @@ x_{1A}+x_{2A}\ge 40,\qquad x_{1B}+x_{2B}\ge 30,
 x_{1A},x_{1B},x_{2A},x_{2B}\ge 0,\qquad y_1,y_2\in\{0,1\}.
 \]
 
-\subsection{Ejercicio 5: Programación de bombas en red hidráulica (modelo discreto horario)}
+\subsection{Ejercicio 5: Planificación de inventarios multiproducto y multi-período en farmacia}
 
 \subsubsection*{Parámetros}
+Conjunto de productos y períodos:
 \[
-p=10 \quad \text{(producción equivalente por bomba y hora)},
-\]
-\[
-n^{0}=70,\qquad 67.67\le n_h \le 76.2.
+P=\{A,B\},\qquad T=\{1,2,3\}.
 \]
 
-Tarifas:
+Costos de compra:
 \[
-c_h=
-\begin{cases}
-0.0244, & h=0,\dots,7,\\
-0.1194, & h=8,\dots,23.
-\end{cases}
+c_{A1}=10,\; c_{A2}=12,\; c_{A3}=11,\qquad c_{B1}=8,\; c_{B2}=9,\; c_{B3}=10.
+\]
+
+Costos de almacenamiento:
+\[
+h_A=2,\qquad h_B=3.
 \]
 
 Demandas:
 \[
-d=(40,40,40,40,45,50,60,70,80,90,90,85,70,60,55,60,65,75,85,90,90,80,60,50).
+d_{A1}=30,\; d_{A2}=40,\; d_{A3}=35,\qquad d_{B1}=20,\; d_{B2}=25,\; d_{B3}=30.
+\]
+
+Capacidad máxima por período:
+\[
+K=100.
+\]
+
+Inventario inicial:
+\[
+I_{A0}=0,\qquad I_{B0}=0.
 \]
 
 \subsubsection*{Variables}
 \[
-x_{h,b}=1 \text{ si la bomba } b \text{ opera en la hora } h,\qquad 0 \text{ en caso contrario.}
+x_{pt}=\text{cantidad pedida del producto } p \text{ en el período } t,
 \]
 \[
-n_h=\text{nivel del tanque al final de la hora } h,\qquad h=0,\dots,23,\quad b=1,\dots,4.
+I_{pt}=\text{inventario final del producto } p \text{ en el período } t.
 \]
 
 \subsubsection*{Función objetivo}
 \[
-\begin{aligned}
-\min Z ={}& 0.0244(x_{01}+x_{02}+x_{03}+x_{04}) + 0.0244(x_{11}+x_{12}+x_{13}+x_{14}) \\
-&+ 0.0244(x_{21}+x_{22}+x_{23}+x_{24}) + 0.0244(x_{31}+x_{32}+x_{33}+x_{34}) \\
-&+ 0.0244(x_{41}+x_{42}+x_{43}+x_{44}) + 0.0244(x_{51}+x_{52}+x_{53}+x_{54}) \\
-&+ 0.0244(x_{61}+x_{62}+x_{63}+x_{64}) + 0.0244(x_{71}+x_{72}+x_{73}+x_{74}) \\
-&+ 0.1194(x_{81}+x_{82}+x_{83}+x_{84}) + 0.1194(x_{91}+x_{92}+x_{93}+x_{94}) \\
-&+ 0.1194(x_{10,1}+x_{10,2}+x_{10,3}+x_{10,4}) + 0.1194(x_{11,1}+x_{11,2}+x_{11,3}+x_{11,4}) \\
-&+ 0.1194(x_{12,1}+x_{12,2}+x_{12,3}+x_{12,4}) + 0.1194(x_{13,1}+x_{13,2}+x_{13,3}+x_{13,4}) \\
-&+ 0.1194(x_{14,1}+x_{14,2}+x_{14,3}+x_{14,4}) + 0.1194(x_{15,1}+x_{15,2}+x_{15,3}+x_{15,4}) \\
-&+ 0.1194(x_{16,1}+x_{16,2}+x_{16,3}+x_{16,4}) + 0.1194(x_{17,1}+x_{17,2}+x_{17,3}+x_{17,4}) \\
-&+ 0.1194(x_{18,1}+x_{18,2}+x_{18,3}+x_{18,4}) + 0.1194(x_{19,1}+x_{19,2}+x_{19,3}+x_{19,4}) \\
-&+ 0.1194(x_{20,1}+x_{20,2}+x_{20,3}+x_{20,4}) + 0.1194(x_{21,1}+x_{21,2}+x_{21,3}+x_{21,4}) \\
-&+ 0.1194(x_{22,1}+x_{22,2}+x_{22,3}+x_{22,4}) + 0.1194(x_{23,1}+x_{23,2}+x_{23,3}+x_{23,4})
-\end{aligned}
+\min Z=\sum_{t\in T}\left(c_{At}x_{At}+c_{Bt}x_{Bt}+h_AI_{At}+h_BI_{Bt}\right)
 \]
 
 \subsubsection*{Restricciones}
-Balance del tanque:
+Balance de inventario por producto y período:
 \[
-n_0=n^{0}+p(x_{01}+x_{02}+x_{03}+x_{04})-40,
+I_{A1}=I_{A0}+x_{A1}-30,\qquad
+I_{A2}=I_{A1}+x_{A2}-40,\qquad
+I_{A3}=I_{A2}+x_{A3}-35,
 \]
 \[
-n_1=n_0+10(x_{11}+x_{12}+x_{13}+x_{14})-40,
-\]
-\[
-n_2=n_1+10(x_{21}+x_{22}+x_{23}+x_{24})-40,
-\]
-\[
-n_3=n_2+10(x_{31}+x_{32}+x_{33}+x_{34})-40,
-\]
-\[
-n_4=n_3+10(x_{41}+x_{42}+x_{43}+x_{44})-45,
-\]
-\[
-n_5=n_4+10(x_{51}+x_{52}+x_{53}+x_{54})-50,
-\]
-\[
-n_6=n_5+10(x_{61}+x_{62}+x_{63}+x_{64})-60,
-\]
-\[
-n_7=n_6+10(x_{71}+x_{72}+x_{73}+x_{74})-70,
-\]
-\[
-n_8=n_7+10(x_{81}+x_{82}+x_{83}+x_{84})-80,
-\]
-\[
-n_9=n_8+10(x_{91}+x_{92}+x_{93}+x_{94})-90,
-\]
-\[
-n_{10}=n_9+10(x_{10,1}+x_{10,2}+x_{10,3}+x_{10,4})-90,
-\]
-\[
-n_{11}=n_{10}+10(x_{11,1}+x_{11,2}+x_{11,3}+x_{11,4})-85,
-\]
-\[
-n_{12}=n_{11}+10(x_{12,1}+x_{12,2}+x_{12,3}+x_{12,4})-70,
-\]
-\[
-n_{13}=n_{12}+10(x_{13,1}+x_{13,2}+x_{13,3}+x_{13,4})-60,
-\]
-\[
-n_{14}=n_{13}+10(x_{14,1}+x_{14,2}+x_{14,3}+x_{14,4})-55,
-\]
-\[
-n_{15}=n_{14}+10(x_{15,1}+x_{15,2}+x_{15,3}+x_{15,4})-60,
-\]
-\[
-n_{16}=n_{15}+10(x_{16,1}+x_{16,2}+x_{16,3}+x_{16,4})-65,
-\]
-\[
-n_{17}=n_{16}+10(x_{17,1}+x_{17,2}+x_{17,3}+x_{17,4})-75,
-\]
-\[
-n_{18}=n_{17}+10(x_{18,1}+x_{18,2}+x_{18,3}+x_{18,4})-85,
-\]
-\[
-n_{19}=n_{18}+10(x_{19,1}+x_{19,2}+x_{19,3}+x_{19,4})-90,
-\]
-\[
-n_{20}=n_{19}+10(x_{20,1}+x_{20,2}+x_{20,3}+x_{20,4})-90,
-\]
-\[
-n_{21}=n_{20}+10(x_{21,1}+x_{21,2}+x_{21,3}+x_{21,4})-80,
-\]
-\[
-n_{22}=n_{21}+10(x_{22,1}+x_{22,2}+x_{22,3}+x_{22,4})-60,
-\]
-\[
-n_{23}=n_{22}+10(x_{23,1}+x_{23,2}+x_{23,3}+x_{23,4})-50.
+I_{B1}=I_{B0}+x_{B1}-20,\qquad
+I_{B2}=I_{B1}+x_{B2}-25,\qquad
+I_{B3}=I_{B2}+x_{B3}-30.
 \]
 
-Presión mínima simplificada:
+Capacidad de almacenamiento por período:
 \[
-10(x_{01}+x_{02}+x_{03}+x_{04})\ge 16.0,\qquad
-10(x_{11}+x_{12}+x_{13}+x_{14})\ge 16.0,
-\]
-\[
-10(x_{21}+x_{22}+x_{23}+x_{24})\ge 16.0,\qquad
-10(x_{31}+x_{32}+x_{33}+x_{34})\ge 16.0,
-\]
-\[
-10(x_{41}+x_{42}+x_{43}+x_{44})\ge 18.0,\qquad
-10(x_{51}+x_{52}+x_{53}+x_{54})\ge 20.0,
-\]
-\[
-10(x_{61}+x_{62}+x_{63}+x_{64})\ge 24.0,\qquad
-10(x_{71}+x_{72}+x_{73}+x_{74})\ge 28.0,
-\]
-\[
-10(x_{81}+x_{82}+x_{83}+x_{84})\ge 32.0,\qquad
-10(x_{91}+x_{92}+x_{93}+x_{94})\ge 36.0,
-\]
-\[
-10(x_{10,1}+x_{10,2}+x_{10,3}+x_{10,4})\ge 36.0,\qquad
-10(x_{11,1}+x_{11,2}+x_{11,3}+x_{11,4})\ge 34.0,
-\]
-\[
-10(x_{12,1}+x_{12,2}+x_{12,3}+x_{12,4})\ge 28.0,\qquad
-10(x_{13,1}+x_{13,2}+x_{13,3}+x_{13,4})\ge 24.0,
-\]
-\[
-10(x_{14,1}+x_{14,2}+x_{14,3}+x_{14,4})\ge 22.0,\qquad
-10(x_{15,1}+x_{15,2}+x_{15,3}+x_{15,4})\ge 24.0,
-\]
-\[
-10(x_{16,1}+x_{16,2}+x_{16,3}+x_{16,4})\ge 26.0,\qquad
-10(x_{17,1}+x_{17,2}+x_{17,3}+x_{17,4})\ge 30.0,
-\]
-\[
-10(x_{18,1}+x_{18,2}+x_{18,3}+x_{18,4})\ge 34.0,\qquad
-10(x_{19,1}+x_{19,2}+x_{19,3}+x_{19,4})\ge 36.0,
-\]
-\[
-10(x_{20,1}+x_{20,2}+x_{20,3}+x_{20,4})\ge 36.0,\qquad
-10(x_{21,1}+x_{21,2}+x_{21,3}+x_{21,4})\ge 32.0,
-\]
-\[
-10(x_{22,1}+x_{22,2}+x_{22,3}+x_{22,4})\ge 24.0,\qquad
-10(x_{23,1}+x_{23,2}+x_{23,3}+x_{23,4})\ge 20.0.
+I_{At}+I_{Bt}\le 100,\qquad t=1,2,3.
 \]
 
-Máximo de bombas por hora:
+No negatividad:
 \[
-x_{01}+x_{02}+x_{03}+x_{04}\le 4,\qquad x_{11}+x_{12}+x_{13}+x_{14}\le 4,
-\]
-\[
-x_{21}+x_{22}+x_{23}+x_{24}\le 4,\qquad x_{31}+x_{32}+x_{33}+x_{34}\le 4,
-\]
-\[
-x_{41}+x_{42}+x_{43}+x_{44}\le 4,\qquad x_{51}+x_{52}+x_{53}+x_{54}\le 4,
-\]
-\[
-x_{61}+x_{62}+x_{63}+x_{64}\le 4,\qquad x_{71}+x_{72}+x_{73}+x_{74}\le 4,
-\]
-\[
-x_{81}+x_{82}+x_{83}+x_{84}\le 4,\qquad x_{91}+x_{92}+x_{93}+x_{94}\le 4,
-\]
-\[
-x_{10,1}+x_{10,2}+x_{10,3}+x_{10,4}\le 4,\qquad x_{11,1}+x_{11,2}+x_{11,3}+x_{11,4}\le 4,
-\]
-\[
-x_{12,1}+x_{12,2}+x_{12,3}+x_{12,4}\le 4,\qquad x_{13,1}+x_{13,2}+x_{13,3}+x_{13,4}\le 4,
-\]
-\[
-x_{14,1}+x_{14,2}+x_{14,3}+x_{14,4}\le 4,\qquad x_{15,1}+x_{15,2}+x_{15,3}+x_{15,4}\le 4,
-\]
-\[
-x_{16,1}+x_{16,2}+x_{16,3}+x_{16,4}\le 4,\qquad x_{17,1}+x_{17,2}+x_{17,3}+x_{17,4}\le 4,
-\]
-\[
-x_{18,1}+x_{18,2}+x_{18,3}+x_{18,4}\le 4,\qquad x_{19,1}+x_{19,2}+x_{19,3}+x_{19,4}\le 4,
-\]
-\[
-x_{20,1}+x_{20,2}+x_{20,3}+x_{20,4}\le 4,\qquad x_{21,1}+x_{21,2}+x_{21,3}+x_{21,4}\le 4,
-\]
-\[
-x_{22,1}+x_{22,2}+x_{22,3}+x_{22,4}\le 4,\qquad x_{23,1}+x_{23,2}+x_{23,3}+x_{23,4}\le 4.
-\]
-
-Naturaleza de las variables:
-\[
-x_{h,b}\in\{0,1\},\qquad n_h\in\mathbb{R},\qquad 67.67\le n_h\le 76.2.
+x_{pt}\ge 0,\qquad I_{pt}\ge 0,\qquad p\in\{A,B\},\; t\in\{1,2,3\}.
 \]
 
 \subsection{Ejercicio 6: Producción, distribución e inventarios multi-período (PLEM)}
@@ -971,7 +818,7 @@ Los resultados obtenidos en Python y Java muestran una alta consistencia en la r
 
 Desde la perspectiva del análisis de sensibilidad, en los ejercicios factibles las restricciones activas permiten identificar los recursos críticos del sistema. En el ejercicio 1, la demanda es la restricción dominante y los recursos presentan holgura; en el ejercicio 2, la capacidad del servidor S3 actúa como recurso limitante; en el ejercicio 3, la capacidad de la bodega B se comporta como cuello de botella; y en el ejercicio 6, las restricciones de demanda e inventario tienen mayor incidencia que las de capacidad. En conjunto, esto muestra que los modelos no solo ofrecen una solución óptima, sino también información útil para interpretar qué recursos condicionan el desempeño del sistema.
 
-Por otra parte, los ejercicios 4 y 5 fueron reportados como inviables en ambas herramientas. En el ejercicio 4, la incompatibilidad entre las demandas mínimas y la disponibilidad de materia prima impide alcanzar una solución factible. En el ejercicio 5, la inviabilidad se asocia a inconsistencias entre restricciones operativas, niveles del tanque, presión mínima y límites de operación de bombas. En estos casos no es válido interpretar valores objetivo o realizar un análisis de sensibilidad formal, ya que el problema radica en la formulación y no en el lenguaje utilizado.
+Por otra parte, el ejercicio 4 fue reportado como inviable en ambas herramientas. En este caso, la incompatibilidad entre las demandas mínimas y la disponibilidad de materia prima impide alcanzar una solución factible. En este tipo de escenarios no es válido interpretar valores objetivo o realizar un análisis de sensibilidad formal, ya que el problema radica en la formulación y no en el lenguaje utilizado.
 
 En síntesis, la comparación evidencia que Python y Java producen resultados equivalentes cuando el modelo está bien planteado, y que también coinciden al detectar de forma correcta los casos de inviabilidad. Esto refuerza la validez del análisis y permite concluir que, además de encontrar soluciones, los modelos ayudan a identificar restricciones críticas, soluciones múltiples y conflictos estructurales que deben corregirse para representar de mejor manera situaciones reales.
 
