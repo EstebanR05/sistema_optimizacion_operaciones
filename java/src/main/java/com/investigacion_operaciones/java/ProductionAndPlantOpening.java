@@ -9,43 +9,70 @@ import org.ojalgo.optimisation.Variable;
 
 public class ProductionAndPlantOpening  extends Helpers {
 
-    public void handler() {
-        String[] plants = {"1", "2"};
-        int[] capacities = {80, 100};
-        int[] fixedCost = {600, 500};
-        String[] products = {"A", "B"};
-        int[] profits = {30, 40};
-        int[] minDemand = {40, 30};
-        int[][] resources = {
-            {3, 2},
-            {2, 3}
-        };
-        String[] resourceNames = {"Mano de obra", "Materia prima"};
-        int[] resourceLimits = {200, 150};
+    private record PlantData(
+        String[] plants,
+        int[] capacities,
+        int[] fixedCost,
+        String[] products,
+        int[] profits,
+        int[] minDemand,
+        int[][] resources,
+        String[] resourceNames,
+        int[] resourceLimits
+    ) {}
 
+    private record PlantModel(ExpressionsBasedModel model) {}
+
+    public void handler() {
+        PlantData data = buildData();
+        printDecisionVariables(data);
+        printObjective(data);
+        PlantModel model = buildModel(data);
+        printConstraints(data);
+        printInfeasibleSolution(model);
+    }
+
+    private PlantData buildData() {
+        return new PlantData(
+            new String[]{"1", "2"},
+            new int[]{80, 100},
+            new int[]{600, 500},
+            new String[]{"A", "B"},
+            new int[]{30, 40},
+            new int[]{40, 30},
+            new int[][]{{3, 2}, {2, 3}},
+            new String[]{"Mano de obra", "Materia prima"},
+            new int[]{200, 150}
+        );
+    }
+
+    private void printDecisionVariables(PlantData data) {
         printSection("1) VARIABLES DE DECISIÓN");
         System.out.println("xij = unidades del producto j producidas en la planta i");
-        for (String plant : plants) {
+        for (String plant : data.plants) {
             System.out.println("y" + plant + " = 1 si se abre Planta " + plant);
         }
         printBlankLine();
+    }
 
+    private void printObjective(PlantData data) {
         List<String> gainTerms = new ArrayList<>();
         List<String> costTerms = new ArrayList<>();
-        for (String plant : plants) {
-            for (int j = 0; j < products.length; j++) {
-                gainTerms.add(profits[j] + "x" + plant + products[j]);
+        for (String plant : data.plants) {
+            for (int j = 0; j < data.products.length; j++) {
+                gainTerms.add(data.profits[j] + "x" + plant + data.products[j]);
             }
         }
-        for (int i = 0; i < plants.length; i++) {
-            costTerms.add(fixedCost[i] + "y" + plants[i]);
+        for (int i = 0; i < data.plants.length; i++) {
+            costTerms.add(data.fixedCost[i] + "y" + data.plants[i]);
         }
         printSection("2) FUNCIÓN OBJETIVO");
         System.out.println("Max Z = " + joinTerms(gainTerms) + " - " + String.join(" - ", costTerms));
         printBlankLine();
+    }
 
+    private PlantModel buildModel(PlantData data) {
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-
         Variable x1A = model.newVariable("x1A").lower(0).weight(30);
         Variable x1B = model.newVariable("x1B").lower(0).weight(40);
         Variable x2A = model.newVariable("x2A").lower(0).weight(30);
@@ -53,78 +80,54 @@ public class ProductionAndPlantOpening  extends Helpers {
         Variable y1 = model.newVariable("y1").binary().weight(-600);
         Variable y2 = model.newVariable("y2").binary().weight(-500);
 
-        model.addExpression("Mano_Obra")
-                .set(x1A, 3)
-                .set(x1B, 2)
-                .set(x2A, 3)
-                .set(x2B, 2)
-                .upper(200);
+        model.addExpression("Mano_Obra").set(x1A, 3).set(x1B, 2).set(x2A, 3).set(x2B, 2).upper(200);
+        model.addExpression("Materia_Prima").set(x1A, 2).set(x1B, 3).set(x2A, 2).set(x2B, 3).upper(150);
+        model.addExpression("Capacidad_P1").set(x1A, 1).set(x1B, 1).set(y1, -80).upper(0);
+        model.addExpression("Capacidad_P2").set(x2A, 1).set(x2B, 1).set(y2, -100).upper(0);
+        model.addExpression("Demanda_A").set(x1A, 1).set(x2A, 1).lower(40);
+        model.addExpression("Demanda_B").set(x1B, 1).set(x2B, 1).lower(30);
 
-        model.addExpression("Materia_Prima")
-                .set(x1A, 2)
-                .set(x1B, 3)
-                .set(x2A, 2)
-                .set(x2B, 3)
-                .upper(150);
+        return new PlantModel(model);
+    }
 
-        model.addExpression("Capacidad_P1")
-                .set(x1A, 1)
-                .set(x1B, 1)
-                .set(y1, -80)
-                .upper(0);
-
-        model.addExpression("Capacidad_P2")
-                .set(x2A, 1)
-                .set(x2B, 1)
-                .set(y2, -100)
-                .upper(0);
-
-        model.addExpression("Demanda_A")
-                .set(x1A, 1)
-                .set(x2A, 1)
-                .lower(40);
-
-        model.addExpression("Demanda_B")
-                .set(x1B, 1)
-                .set(x2B, 1)
-                .lower(30);
-
+    private void printConstraints(PlantData data) {
         printSection("3) RESTRICCIONES");
-        for (int r = 0; r < resourceNames.length; r++) {
+        for (int r = 0; r < data.resourceNames.length; r++) {
             List<String> terms = new ArrayList<>();
-            for (String plant : plants) {
-                for (int j = 0; j < products.length; j++) {
-                    terms.add(resources[r][j] + "x" + plant + products[j]);
+            for (String plant : data.plants) {
+                for (int j = 0; j < data.products.length; j++) {
+                    terms.add(data.resources[r][j] + "x" + plant + data.products[j]);
                 }
             }
-            System.out.println(resourceNames[r] + ":");
-            System.out.println(joinTerms(terms) + " <= " + resourceLimits[r]);
+            System.out.println(data.resourceNames[r] + ":");
+            System.out.println(joinTerms(terms) + " <= " + data.resourceLimits[r]);
             printBlankLine();
         }
         printSection("Capacidad por planta:");
-        for (int i = 0; i < plants.length; i++) {
+        for (int i = 0; i < data.plants.length; i++) {
             List<String> terms = new ArrayList<>();
-            for (String product : products) {
-                terms.add("x" + plants[i] + product);
+            for (String product : data.products) {
+                terms.add("x" + data.plants[i] + product);
             }
-            System.out.println(joinTerms(terms) + " <= " + capacities[i] + "y" + plants[i]);
+            System.out.println(joinTerms(terms) + " <= " + data.capacities[i] + "y" + data.plants[i]);
         }
         printBlankLine();
         printSection("Demanda mínima:");
-        for (int j = 0; j < products.length; j++) {
+        for (int j = 0; j < data.products.length; j++) {
             List<String> terms = new ArrayList<>();
-            for (String plant : plants) {
-                terms.add("x" + plant + products[j]);
+            for (String plant : data.plants) {
+                terms.add("x" + plant + data.products[j]);
             }
-            System.out.println(joinTerms(terms) + " >= " + minDemand[j]);
+            System.out.println(joinTerms(terms) + " >= " + data.minDemand[j]);
         }
         printBlankLine();
         printSection("No negatividad y binarias");
         System.out.println("xij >= 0, yi = 0 o 1");
         printBlankLine();
+    }
 
-        Optimisation.Result result = model.maximise();
-
+    private void printInfeasibleSolution(PlantModel model) {
+        Optimisation.Result result = model.model.maximise();
         printSection("4) SOLUCIÓN");
         System.out.println("Estado: " + toPythonLikeStatus(result));
         printBlankLine();
