@@ -623,7 +623,7 @@ for bodega in bodegas:
         )
 
 """Una empresa manufacturera produce dos productos: A y B. Para ello puede operar hasta dos plantas, Planta 1 y Planta 2. Abrir una planta implica un costo fijo semanal de 600 para la Planta 1 y de 500 para la Planta 2.
-La empresa cuenta con recursos limitados para la producción. Dispone de un máximo de 200 horas de mano de obra y 150 kg de materia prima por semana. Cada unidad del Producto A requiere 3 horas de mano de obra y 2 kg de materia prima, mientras que cada unidad del Producto B requiere 2 horas de mano de obra y 3 kg de materia prima.
+La empresa cuenta con recursos limitados para la producción. Dispone de un máximo de 200 horas de mano de obra y 200 kg de materia prima por semana. Cada unidad del Producto A requiere 3 horas de mano de obra y 2 kg de materia prima, mientras que cada unidad del Producto B requiere 2 horas de mano de obra y 3 kg de materia prima.
 Las plantas tienen una capacidad máxima de producción total. La Planta 1 puede producir hasta 80 unidades en total y la Planta 2 hasta 100 unidades en total. Cada planta puede producir ambos productos, pero únicamente si ha sido abierta.
 La utilidad generada por cada unidad producida es de 30 para el Producto A y de 40 para el Producto B. Además, la empresa debe cumplir con una demanda mínima semanal de 40 unidades del Producto A y 30 unidades del Producto B.
 La empresa debe decidir qué plantas abrir y cuántas unidades de cada producto producir en cada planta, con el fin de maximizar la ganancia total, considerando las utilidades obtenidas por la producción y los costos fijos de apertura de las plantas.
