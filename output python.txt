@@ -217,7 +217,7 @@ Mano de obra:
 3x1A + 2x1B + 3x2A + 2x2B <= 200
 
 Materia prima:
-2x1A + 3x1B + 2x2A + 3x2B <= 150
+2x1A + 3x1B + 2x2A + 3x2B <= 200
 
 Capacidad por planta:
 x1A + x1B <= 80y1
@@ -231,18 +231,38 @@ No negatividad y binarias
 xij >= 0, yi = 0 o 1
 
 4) SOLUCIÓN
-Estado: Infeasible
+Estado: Optimal
 
-El modelo no tiene una solución factible.
-No se deben interpretar los valores de las variables como solución óptima.
+Variables óptimas:
+x1A = 0.0
+x1B = 0.0
+x2A = 40.0
+x2B = 40.0
 
-Posible causa:
-Con los recursos disponibles no se puede cumplir simultáneamente
-la demanda mínima de A y B junto con las demás restricciones.
+y1 (Planta 1) = 0.0
+y2 (Planta 2) = 1.0
+
+Ganancia máxima:
+Z = 2300.0
+
+Uso de recursos:
+Mano de obra usada = 200.0 de 200
+Materia prima usada = 200.0 de 200
+
+Producción total:
+Producto A = 40.0
+Producto B = 40.0
+
+Capacidad utilizada:
+Planta 1 = 0.0 de 80
+Planta 2 = 80.0 de 100
+
+Interpretación:
+No se abre Planta 1
+Se abre Planta 2
 
 
 ejercicio #5:
-
 1) VARIABLES DE DECISIÓN
 qpt = cantidad comprada del producto p en el período t
 ipt = inventario del producto p al final del período t
@@ -302,8 +322,8 @@ t1 = 40.0 de 100
 t2 = 0.0 de 100
 t3 = 0.0 de 100
 
-ejercicio #6:
 
+ejercicio #6:
 1) VARIABLES DE DECISIÓN
 xpt = producción
 epbt = envío
