@@ -243,114 +243,147 @@ la demanda mínima de A y B junto con las demás restricciones.
 
 ejercicio #5:
 
-
-ejercicio #6:
 1) VARIABLES DE DECISIÓN
-xpt = cantidad producida del producto p en el período t
-epbt = cantidad enviada del producto p a la bodega b en el período t
-ipbt = inventario del producto p en la bodega b al final del período t
-ypt = 1 si se activa la producción del producto p en el período t
+qpt = cantidad comprada del producto p en el período t
+ipt = inventario del producto p al final del período t
+ypt = 1 si se realiza pedido del producto p en el período t
 
 2) FUNCIÓN OBJETIVO
-Min Z = 5x11 + 6x12 + 5x13 + 4x21 + 5x22 + 6x23
-      + 3e111 + 3e112 + 3e113 + 4e121 + 4e122 + 4e123
-      + 2e211 + 2e212 + 2e213 + 3e221 + 3e222 + 3e223
-      + 1i111 + 1i112 + 1i113 + 2i121 + 2i122 + 2i123
-      + 1i211 + 1i212 + 1i213 + 2i221 + 2i222 + 2i223
+Min Z = ΣpΣt cpt·qpt + ΣpΣt hp·ipt
 
 3) RESTRICCIONES
-Capacidad de producción por período:
-x11 + x21 <= 100
-x12 + x22 <= 100
-x13 + x23 <= 100
+Balance de inventario:
+i[p,t-1] + q[p,t] - d[p,t] = i[p,t]
 
-Activación de producción:
-x11 <= 100y11
-x12 <= 100y12
-x13 <= 100y13
-x21 <= 100y21
-x22 <= 100y22
-x23 <= 100y23
+Capacidad de almacenamiento:
+Σp i[p,t] <= 100
 
-Balance producción - envíos:
-x11 = e111 + e121
-x12 = e112 + e122
-x13 = e113 + e123
-x21 = e211 + e221
-x22 = e212 + e222
-x23 = e213 + e223
-
-Balance de inventarios:
-e111 - 20 = i111
-i111 + e112 - 15 = i112
-i112 + e113 - 10 = i113
-
-e121 - 10 = i121
-i121 + e122 - 15 = i122
-i122 + e123 - 20 = i123
-
-e211 - 10 = i211
-i211 + e212 - 20 = i212
-i212 + e213 - 15 = i213
-
-e221 - 15 = i221
-i221 + e222 - 10 = i222
-i222 + e223 - 15 = i223
+Activación de pedido:
+q[p,t] <= M·y[p,t]
 
 No negatividad y binarias:
-xpt >= 0, epbt >= 0, ipbt >= 0, ypt = 0 o 1
+q[p,t] >= 0
+i[p,t] >= 0
+y[p,t] = 0 o 1
+
 
 4) SOLUCIÓN
 Estado: Optimal
 
-Producción óptima:
-x11 = 45.0
-x12 = 15.0
-x13 = 30.0
-x21 = 45.0
-x22 = 10.0
-x23 = 30.0
-
-Envíos óptimos:
-e111 = 35.0
-e112 = 0.0
-e113 = 10.0
-e121 = 10.0
-e122 = 15.0
-e123 = 20.0
-e211 = 30.0
-e212 = 0.0
-e213 = 15.0
-e221 = 15.0
-e222 = 10.0
-e223 = 15.0
+Compras óptimas:
+qA1 = 70.0
+qA2 = 0.0
+qA3 = 35.0
+qB1 = 20.0
+qB2 = 25.0
+qB3 = 30.0
 
 Inventarios óptimos:
-i111 = 15.0
-i112 = 0.0
-i113 = 0.0
-i121 = 0.0
-i122 = 0.0
-i123 = 0.0
-i211 = 20.0
-i212 = 0.0
-i213 = 0.0
-i221 = 0.0
-i222 = 0.0
-i223 = 0.0
+iA1 = 40.0
+iA2 = 0.0
+iA3 = 0.0
+iB1 = 0.0
+iB2 = 0.0
+iB3 = 0.0
 
-Activación de producción:
-y11 = 1.0
-y12 = 1.0
-y13 = 1.0
-y21 = 1.0
-y22 = 1.0
-y23 = 1.0
+Activación de pedidos:
+yA1 = 1.0
+yA2 = 1.0
+yA3 = 1.0
+yB1 = 1.0
+yB2 = 1.0
+yB3 = 1.0
+
+Costo mínimo total:
+Z = 1850.0
+
+Verificación de capacidad de almacenamiento:
+t1 = 40.0 de 100
+t2 = 0.0 de 100
+t3 = 0.0 de 100
+
+ejercicio #6:
+
+1) VARIABLES DE DECISIÓN
+xpt = producción
+epbt = envío
+ipbt = inventario
+ypt = activación
+
+2) FUNCIÓN OBJETIVO
+Min Z = ΣpΣt cpt·xpt + ΣpΣbΣt fpb·epbt + ΣpΣbΣt hpb·ipbt
+
+3) RESTRICCIONES
+Capacidad:
+Σp xpt <= 100
+
+Activación:
+xpt <= M·ypt
+
+Producción-envío:
+xpt = Σb epbt
+
+Inventario:
+ipb(t-1) + epbt - dpbt = ipbt
+
+No negatividad:
+xpt >= 0
+epbt >= 0
+ipbt >= 0
+ypt binaria
+
+
+4) SOLUCIÓN
+Estado: Optimal
+
+Producción:
+11 = 45.0
+12 = 15.0
+13 = 30.0
+21 = 45.0
+22 = 10.0
+23 = 30.0
+
+Envíos:
+111 = 35.0
+112 = 0.0
+113 = 10.0
+121 = 10.0
+122 = 15.0
+123 = 20.0
+211 = 30.0
+212 = 0.0
+213 = 15.0
+221 = 15.0
+222 = 10.0
+223 = 15.0
+
+Inventarios:
+111 = 15.0
+112 = 0.0
+113 = 0.0
+121 = 0.0
+122 = 0.0
+123 = 0.0
+211 = 20.0
+212 = 0.0
+213 = 0.0
+221 = 0.0
+222 = 0.0
+223 = 0.0
+
+Activación:
+11 = 1.0
+12 = 1.0
+13 = 1.0
+21 = 1.0
+22 = 1.0
+23 = 1.0
 
 Costo mínimo total:
 Z = 1435.0
 
-Verificación de capacidad por período:
+Verificación de capacidad:
 t1 = 90.0 de 100
 t2 = 25.0 de 100
 t3 = 60.0 de 100
@@ -362,21 +395,10 @@ P2-B1: t1=30.0, t2=20.0, t3=15.0
 P2-B2: t1=15.0, t2=10.0, t3=15.0
 
 Interpretación:
-El modelo determina la cantidad óptima a producir de cada producto en cada período,
-la cantidad que debe enviarse a cada bodega y el inventario que conviene mantener
-al final de cada período, con el fin de minimizar el costo total del sistema.
+El modelo determina cuánto producir de cada producto en cada período,
+cuánto enviar a cada bodega y cuánto inventario mantener al final
+de cada período.
 
-Además, las variables binarias de activación indican en qué períodos conviene
-habilitar la producción de cada producto. Si una variable ypt toma valor 1,
-significa que en ese período sí se produce el producto correspondiente;
-si toma valor 0, significa que no se activa su producción.
-
-La solución obtenida cumple simultáneamente con:
-- La capacidad máxima de producción en cada período.
-- El balance entre producción y envíos.
-- El balance de inventarios en cada bodega.
-- La satisfacción de la demanda en todos los períodos.
-
-En conclusión, el modelo encuentra un plan de producción, distribución
-e inventario que satisface todas las necesidades de las bodegas al menor
-costo posible, aprovechando cuándo producir, cuánto enviar y cuánto almacenar.
+La solución minimiza el costo total considerando producción,
+transporte e inventario, respetando la capacidad y satisfaciendo
+la demanda de cada producto en cada bodega.
