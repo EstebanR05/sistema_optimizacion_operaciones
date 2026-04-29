@@ -386,315 +386,242 @@ La formulación matemática presentada a continuación conserva el mismo modelo 
 
 \subsubsection*{Parámetros}
 \[
-u_1=30,\quad u_2=50,\quad t_1=2,\quad t_2=5,\quad T=100,
+I=\{1,2\},\qquad
+u_i=\text{utilidad unitaria},\qquad
+a_i=\text{horas por unidad},
 \]
 \[
-m_1=1,\quad m_2=3,\quad M=60,\quad d_1=20,\quad d_2=10.
+b_i=\text{material por unidad},\qquad
+T=\text{horas disponibles},\qquad
+M=\text{material disponible},\qquad
+d_i=\text{demanda máxima}.
 \]
 
 \subsubsection*{Variables}
 \[
-x_1=\text{número de sillas},\qquad x_2=\text{número de mesas}.
+x_i=\text{cantidad a producir del producto } i.
 \]
 
 \subsubsection*{Función objetivo}
 \[
-\max Z=30x_1+50x_2
+\max Z=\sum_{i\in I}u_i x_i
 \]
 
 \subsubsection*{Restricciones}
 \[
-2x_1+5x_2\le 100,
+\sum_{i\in I}a_i x_i\le T,
 \]
 \[
-x_1+3x_2\le 60,
+\sum_{i\in I}b_i x_i\le M,
 \]
 \[
-x_1\le 20,\qquad x_2\le 10,
+x_i\le d_i,\qquad \forall i\in I,
 \]
 \[
-x_1,x_2\ge 0,\qquad x_1,x_2\in\mathbb{Z}.
+x_i\ge 0,\quad x_i\in\mathbb{Z},\qquad \forall i\in I.
 \]
 
 \subsection{Ejercicio 2: Asignación de aplicaciones en servidores (PL continua)}
 
 \subsubsection*{Parámetros}
-Capacidades:
 \[
-C_1=100,\qquad C_2=150,\qquad C_3=200.
+S=\{1,2,3\},\qquad
+A=\{1,2,3,4\},\qquad
+C_s=\text{capacidad del servidor } s,
 \]
-
-Costos energéticos:
 \[
-c_1=0.5,\qquad c_2=0.4,\qquad c_3=0.3.
-\]
-
-Requerimientos:
-\[
-r_1=50,\qquad r_2=60,\qquad r_3=80,\qquad r_4=70.
+e_s=\text{consumo energético por GHz del servidor } s,\qquad
+r_a=\text{requerimiento de la aplicación } a.
 \]
 
 \subsubsection*{Variables}
 \[
-x_{ij}=\text{GHz del servidor } i \text{ asignados a la aplicación } j.
+x_{sa}=\text{GHz del servidor } s \text{ asignados a la aplicación } a.
 \]
 
 \subsubsection*{Función objetivo}
 \[
-\min Z = 0.5x_{11}+0.5x_{12}+0.5x_{13}+0.5x_{14}
-+0.4x_{21}+0.4x_{22}+0.4x_{23}+0.4x_{24}
-+0.3x_{31}+0.3x_{32}+0.3x_{33}+0.3x_{34}
+\min Z=\sum_{s\in S}\sum_{a\in A}e_s x_{sa}
 \]
 
 \subsubsection*{Restricciones}
 \[
-x_{11}+x_{12}+x_{13}+x_{14}\le 100,
+\sum_{a\in A}x_{sa}\le C_s,\qquad \forall s\in S,
 \]
 \[
-x_{21}+x_{22}+x_{23}+x_{24}\le 150,
+\sum_{s\in S}x_{sa}=r_a,\qquad \forall a\in A,
 \]
 \[
-x_{31}+x_{32}+x_{33}+x_{34}\le 200,
-\]
-\[
-x_{11}+x_{21}+x_{31}=50,
-\]
-\[
-x_{12}+x_{22}+x_{32}=60,
-\]
-\[
-x_{13}+x_{23}+x_{33}=80,
-\]
-\[
-x_{14}+x_{24}+x_{34}=70,
-\]
-\[
-x_{ij}\ge 0.
+x_{sa}\ge 0,\qquad \forall s\in S,\ \forall a\in A.
 \]
 
 \subsection{Ejercicio 3: Apertura de bodegas y transporte (PLEM)}
 
 \subsubsection*{Parámetros}
-Demandas:
 \[
-d_1=80,\qquad d_2=70,\qquad d_3=60.
+B=\{A,B\},\qquad
+C=\{1,2,3\},\qquad
+d_c=\text{demanda del cliente } c,
 \]
-
-Capacidades:
 \[
-K_A=150,\qquad K_B=120.
+K_b=\text{capacidad de la bodega } b,\qquad
+f_b=\text{costo fijo de apertura de la bodega } b,
 \]
-
-Costos fijos:
 \[
-f_A=500,\qquad f_B=400.
-\]
-
-Costos de transporte:
-\[
-c_{A1}=4,\; c_{A2}=6,\; c_{A3}=9,\; c_{B1}=5,\; c_{B2}=4,\; c_{B3}=7.
+c_{bc}=\text{costo unitario de enviar desde bodega } b \text{ al cliente } c.
 \]
 
 \subsubsection*{Variables}
 \[
-x_{Aj},x_{Bj}\ge 0 \quad \text{para } j\in\{1,2,3\},
+x_{bc}=\text{unidades enviadas desde bodega } b \text{ al cliente } c,
 \]
 \[
-y_A,y_B\in\{0,1\}.
+y_b=\begin{cases}
+1,& \text{si se abre la bodega } b,\\
+0,& \text{en otro caso.}
+\end{cases}
 \]
 
 \subsubsection*{Función objetivo}
 \[
-\min Z = 500y_A + 400y_B + 4x_{A1}+6x_{A2}+9x_{A3}+5x_{B1}+4x_{B2}+7x_{B3}
+\min Z=\sum_{b\in B}f_b y_b+\sum_{b\in B}\sum_{c\in C}c_{bc}x_{bc}
 \]
 
 \subsubsection*{Restricciones}
 \[
-x_{A1}+x_{B1}=80,\qquad x_{A2}+x_{B2}=70,\qquad x_{A3}+x_{B3}=60,
+\sum_{b\in B}x_{bc}=d_c,\qquad \forall c\in C,
 \]
 \[
-x_{A1}+x_{A2}+x_{A3}\le 150y_A,
+\sum_{c\in C}x_{bc}\le K_b y_b,\qquad \forall b\in B,
 \]
 \[
-x_{B1}+x_{B2}+x_{B3}\le 120y_B,
+x_{bc}\ge 0,\qquad \forall b\in B,\ \forall c\in C,
 \]
 \[
-x_{Aj},x_{Bj}\ge 0,\qquad y_A,y_B\in\{0,1\}.
+y_b\in\{0,1\},\qquad \forall b\in B.
 \]
 
 \subsection{Ejercicio 4: Producción con apertura de plantas (PLEM)}
 
 \subsubsection*{Parámetros}
-Utilidades:
 \[
-u_A=30,\qquad u_B=40.
-\]
-
-Costos fijos:
-\[
-f_1=600,\qquad f_2=500.
-\]
-
-Recursos disponibles:
-\[
-L=200,\qquad R=150.
-\]
-
-Requerimientos por unidad:
-\[
-\text{Producto A: } 3 \text{ horas y } 2 \text{ kg},
+P=\{1,2\}\ (\text{plantas}),\qquad
+J=\{A,B\}\ (\text{productos}),\qquad
+R=\{\text{mano de obra},\text{materia prima}\},
 \]
 \[
-\text{Producto B: } 2 \text{ horas y } 3 \text{ kg}.
+u_j=\text{utilidad por unidad del producto } j,\quad
+f_p=\text{costo fijo de apertura de la planta } p,\quad
+K_p=\text{capacidad de la planta } p,
 \]
-
-Capacidades:
 \[
-K_1=80,\qquad K_2=100.
-\]
-
-Demandas mínimas:
-\[
-d_A=40,\qquad d_B=30.
+a_{rj}=\text{consumo del recurso } r \text{ por unidad de } j,\quad
+\bar{R}_r=\text{disponibilidad del recurso } r,\quad
+d_j^{\min}=\text{demanda mínima de } j.
 \]
 
 \subsubsection*{Variables}
 \[
-x_{1A},x_{1B},x_{2A},x_{2B}\ge 0,
+x_{pj}=\text{unidades del producto } j \text{ producidas en la planta } p,
 \]
 \[
-y_1,y_2\in\{0,1\}.
+y_p\in\{0,1\}\qquad \forall p\in P.
 \]
 
 \subsubsection*{Función objetivo}
 \[
-\max Z = 30x_{1A}+40x_{1B}+30x_{2A}+40x_{2B}-600y_1-500y_2
+\max Z=\sum_{p\in P}\sum_{j\in J}u_j x_{pj}-\sum_{p\in P}f_p y_p
 \]
 
 \subsubsection*{Restricciones}
 \[
-3x_{1A}+2x_{1B}+3x_{2A}+2x_{2B}\le 200,
+\sum_{p\in P}\sum_{j\in J}a_{rj}x_{pj}\le \bar{R}_r,\qquad \forall r\in R,
 \]
 \[
-2x_{1A}+3x_{1B}+2x_{2A}+3x_{2B}\le 150,
+\sum_{j\in J}x_{pj}\le K_p y_p,\qquad \forall p\in P,
 \]
 \[
-x_{1A}+x_{1B}\le 80y_1,\qquad x_{2A}+x_{2B}\le 100y_2,
+\sum_{p\in P}x_{pj}\ge d_j^{\min},\qquad \forall j\in J,
 \]
 \[
-x_{1A}+x_{2A}\ge 40,\qquad x_{1B}+x_{2B}\ge 30,
+x_{pj}\ge 0,\qquad \forall p\in P,\ \forall j\in J,
 \]
 \[
-x_{1A},x_{1B},x_{2A},x_{2B}\ge 0,\qquad y_1,y_2\in\{0,1\}.
+y_p\in\{0,1\},\qquad \forall p\in P.
 \]
 
 \subsection{Ejercicio 5: Planificación de inventarios multiproducto y multi-período en farmacia}
 
 \subsubsection*{Parámetros}
-Conjunto de productos y períodos:
 \[
-P=\{A,B\},\qquad T=\{1,2,3\}.
+P=\{A,B\},\qquad T=\{1,2,3\},
 \]
-
-Costos de compra:
 \[
-c_{A1}=10,\; c_{A2}=12,\; c_{A3}=11,\qquad c_{B1}=8,\; c_{B2}=9,\; c_{B3}=10.
+c_{pt}=\text{costo de compra del producto } p \text{ en el período } t,\quad
+h_p=\text{costo de inventario por unidad del producto } p,
 \]
-
-Costos de almacenamiento:
 \[
-h_A=2,\qquad h_B=3.
+d_{pt}=\text{demanda del producto } p \text{ en el período } t,\quad
+K=\text{capacidad máxima de almacenamiento por período},
 \]
-
-Demandas:
 \[
-d_{A1}=30,\; d_{A2}=40,\; d_{A3}=35,\qquad d_{B1}=20,\; d_{B2}=25,\; d_{B3}=30.
-\]
-
-Capacidad máxima por período:
-\[
-K=100.
-\]
-
-Inventario inicial:
-\[
-I_{A0}=0,\qquad I_{B0}=0.
+I_{p0}=\text{inventario inicial del producto } p,\quad
+M=\text{constante grande para activación de pedido}.
 \]
 
 \subsubsection*{Variables}
 \[
-x_{pt}=\text{cantidad pedida del producto } p \text{ en el período } t,
+q_{pt}=\text{cantidad comprada del producto } p \text{ en el período } t,
 \]
 \[
-I_{pt}=\text{inventario final del producto } p \text{ en el período } t.
+I_{pt}=\text{inventario final del producto } p \text{ en el período } t,
+\]
+\[
+y_{pt}\in\{0,1\}.
 \]
 
 \subsubsection*{Función objetivo}
 \[
-\min Z=\sum_{t\in T}\left(c_{At}x_{At}+c_{Bt}x_{Bt}+h_AI_{At}+h_BI_{Bt}\right)
+\min Z=\sum_{p\in P}\sum_{t\in T}c_{pt}q_{pt}+\sum_{p\in P}\sum_{t\in T}h_pI_{pt}
 \]
 
 \subsubsection*{Restricciones}
-Balance de inventario por producto y período:
 \[
-I_{A1}=I_{A0}+x_{A1}-30,\qquad
-I_{A2}=I_{A1}+x_{A2}-40,\qquad
-I_{A3}=I_{A2}+x_{A3}-35,
+\;I_{p,t-1}+q_{pt}-d_{pt}=I_{pt},\qquad \forall p\in P,\ \forall t\in T,
 \]
 \[
-I_{B1}=I_{B0}+x_{B1}-20,\qquad
-I_{B2}=I_{B1}+x_{B2}-25,\qquad
-I_{B3}=I_{B2}+x_{B3}-30.
+\sum_{p\in P}I_{pt}\le K,\qquad \forall t\in T,
 \]
-
-Capacidad de almacenamiento por período:
 \[
-I_{At}+I_{Bt}\le 100,\qquad t=1,2,3.
+q_{pt}\le M y_{pt},\qquad \forall p\in P,\ \forall t\in T,
 \]
-
-No negatividad:
 \[
-x_{pt}\ge 0,\qquad I_{pt}\ge 0,\qquad p\in\{A,B\},\; t\in\{1,2,3\}.
+q_{pt}\ge 0,\qquad I_{pt}\ge 0,\qquad \forall p\in P,\ \forall t\in T,
+\]
+\[
+y_{pt}\in\{0,1\},\qquad \forall p\in P,\ \forall t\in T.
 \]
 
 \subsection{Ejercicio 6: Producción, distribución e inventarios multi-período (PLEM)}
 
 \subsubsection*{Parámetros}
 \[
-p\in\{1,2\},\qquad b\in\{1,2\},\qquad t\in\{1,2,3\}.
-\]
-
-Costos de producción:
-\[
-P1:(5,6,5),\qquad P2:(4,5,6).
-\]
-
-Costos de transporte:
-\[
-P1\to(B1,B2):(3,4),\qquad P2\to(B1,B2):(2,3).
-\]
-
-Costos de inventario:
-\[
-h_{B1}=1,\qquad h_{B2}=2.
-\]
-
-Capacidad por período:
-\[
-K_t=100,\qquad t=1,2,3.
-\]
-
-Inventario inicial:
-\[
-i_{pb0}=0.
-\]
-
-Demandas:
-\[
-\text{P1-B1}:(20,15,10),\qquad \text{P1-B2}:(10,15,20),
+P=\{1,2\}\ (\text{productos}),\qquad
+B=\{1,2\}\ (\text{bodegas}),\qquad
+T=\{1,2,3\},
 \]
 \[
-\text{P2-B1}:(10,20,15),\qquad \text{P2-B2}:(15,10,15).
+c^x_{pt}=\text{costo de producción del producto } p \text{ en } t,\quad
+c^e_{pb}=\text{costo unitario de envío del producto } p \text{ a la bodega } b,
+\]
+\[
+h_{pb}=\text{costo unitario de inventario de } p \text{ en bodega } b,\quad
+d_{pbt}=\text{demanda de } p \text{ en bodega } b \text{ en } t,
+\]
+\[
+K=\text{capacidad de producción por período},\quad
+I_{pb0}=0,\quad
+M=\text{constante grande de activación}.
 \]
 
 \subsubsection*{Variables}
@@ -713,52 +640,30 @@ y_{pt}\in\{0,1\}.
 
 \subsubsection*{Función objetivo}
 \[
-\min Z =
-5x_{11}+6x_{12}+5x_{13}+4x_{21}+5x_{22}+6x_{23}
-+3e_{111}+3e_{112}+3e_{113}+4e_{121}+4e_{122}+4e_{123}
-+2e_{211}+2e_{212}+2e_{213}+3e_{221}+3e_{222}+3e_{223}
-+i_{111}+i_{112}+i_{113}+2i_{121}+2i_{122}+2i_{123}
-+i_{211}+i_{212}+i_{213}+2i_{221}+2i_{222}+2i_{223}
+\min Z=
+\sum_{p\in P}\sum_{t\in T}c^x_{pt}x_{pt}
+\;+\sum_{p\in P}\sum_{b\in B}\sum_{t\in T}c^e_{pb}e_{pbt}
+\;+\sum_{p\in P}\sum_{b\in B}\sum_{t\in T}h_{pb}i_{pbt}
 \]
 
 \subsubsection*{Restricciones}
-Capacidad por período:
 \[
-x_{11}+x_{21}\le 100,\qquad x_{12}+x_{22}\le 100,\qquad x_{13}+x_{23}\le 100.
-\]
-
-Activación de producción:
-\[
-x_{11}\le 100y_{11},\quad x_{12}\le 100y_{12},\quad x_{13}\le 100y_{13},
+\sum_{p\in P}x_{pt}\le K,\qquad \forall t\in T,
 \]
 \[
-x_{21}\le 100y_{21},\quad x_{22}\le 100y_{22},\quad x_{23}\le 100y_{23}.
-\]
-
-Balance producción--envíos:
-\[
-x_{11}=e_{111}+e_{121},\quad x_{12}=e_{112}+e_{122},\quad x_{13}=e_{113}+e_{123},
+x_{pt}\le M y_{pt},\qquad \forall p\in P,\ \forall t\in T,
 \]
 \[
-x_{21}=e_{211}+e_{221},\quad x_{22}=e_{212}+e_{222},\quad x_{23}=e_{213}+e_{223}.
-\]
-
-Balance de inventarios:
-\[
-e_{111}-20=i_{111},\quad i_{111}+e_{112}-15=i_{112},\quad i_{112}+e_{113}-10=i_{113},
+\sum_{b\in B}e_{pbt}=x_{pt},\qquad \forall p\in P,\ \forall t\in T,
 \]
 \[
-e_{121}-10=i_{121},\quad i_{121}+e_{122}-15=i_{122},\quad i_{122}+e_{123}-20=i_{123},
+i_{pb,t-1}+e_{pbt}-d_{pbt}=i_{pbt},\qquad \forall p\in P,\ \forall b\in B,\ \forall t\in T,
 \]
 \[
-e_{211}-10=i_{211},\quad i_{211}+e_{212}-20=i_{212},\quad i_{212}+e_{213}-15=i_{213},
+x_{pt}\ge 0,\qquad e_{pbt}\ge 0,\qquad i_{pbt}\ge 0,\qquad \forall p\in P,\ \forall b\in B,\ \forall t\in T,
 \]
 \[
-e_{221}-15=i_{221},\quad i_{221}+e_{222}-10=i_{222},\quad i_{222}+e_{223}-15=i_{223}.
-\]
-
-\[
-x_{pt}\ge 0,\qquad e_{pbt}\ge 0,\qquad i_{pbt}\ge 0,\qquad y_{pt}\in\{0,1\}.
+y_{pt}\in\{0,1\},\qquad \forall p\in P,\ \forall t\in T.
 \]
 
 \section{Justificación Técnica de la Herramienta Propuesta (Java -- ojAlgo)}
