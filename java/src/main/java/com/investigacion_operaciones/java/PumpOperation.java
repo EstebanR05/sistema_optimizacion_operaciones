@@ -10,261 +10,171 @@ import org.ojalgo.optimisation.Variable;
 
 public class PumpOperation extends Helpers {
 
-    private record PumpData(int hours, int pumps, double productionPerPump, double initialLevel, double[] demand, double[] tariff) {}
+    private record InvData(
+        String[] products,
+        String[] periods,
+        double[][] purchaseCost,
+        double[] invCost,
+        double[][] demand,
+        double[] initialInv,
+        double storageCapacity,
+        double M
+    ) {}
 
-    private record PumpModel(ExpressionsBasedModel model, Variable[][] x, Variable[] level) {}
-
-    private record PumpSolution(Optimisation.Result result, double[][] pumpValues, double[] levelValues, double objectiveValue) {}
+    private record InvModel(ExpressionsBasedModel model, Variable[][] q, Variable[][] i, Variable[][] y) {}
 
     public void handler() {
-        PumpData data = buildData();
-        printDecisionVariables();
-        printObjective(data);
-        PumpModel model = buildModel(data);
+        InvData data = buildData();
+        InvModel model = buildModel(data);
+        printVariables();
+        printObjective();
         printConstraints(data);
-        PumpSolution solution = solve(model, data);
-        printSolution(solution, data);
+        printSolution(data, model);
     }
 
-    private PumpData buildData() {
-        int hours = 24;
-        int pumps = 4;
-        double[] tariff = new double[hours];
-        for (int h = 0; h < hours; h++) {
-            tariff[h] = (h >= 8 && h <= 23) ? 0.1194 : 0.0244;
-        }
-        return new PumpData(
-            hours,
-            pumps,
-            10.0,
-            70.0,
-            new double[]{
-                40, 40, 40, 40, 45, 50, 60, 70, 80, 90, 90, 85,
-                70, 60, 55, 60, 65, 75, 85, 90, 90, 80, 60, 50
-            },
-            tariff
+    private InvData buildData() {
+        return new InvData(
+            new String[]{"A", "B"},
+            new String[]{"1", "2", "3"},
+            new double[][]{{10, 12, 11}, {8, 9, 10}},
+            new double[]{2, 3},
+            new double[][]{{30, 40, 35}, {20, 25, 30}},
+            new double[]{0, 0},
+            100,
+            200
         );
     }
 
-    private void printDecisionVariables() {
-        printSection("2) VARIABLES DE DECISIÓN");
-        printLines(
-            "xhb = 1 si la bomba b opera en la hora h",
-            "nh = nivel del tanque al final de la hora h"
-        );
-        printBlankLine();
-    }
-
-    private void printObjective(PumpData data) {
-        printSection("3) FUNCIÓN OBJETIVO");
-        System.out.println("Min Z =");
-        for (int h = 0; h < data.hours; h++) {
-            List<String> pumpTerms = new ArrayList<>();
-            for (int b = 0; b < data.pumps; b++) {
-                pumpTerms.add("x" + h + (b + 1));
-            }
-            String row = data.tariff[h] + "(" + joinTerms(pumpTerms) + ")";
-            if (h < data.hours - 1) {
-                row += " +";
-            }
-            System.out.println(row);
-        }
-        printBlankLine();
-    }
-
-    private PumpModel buildModel(PumpData data) {
+    private InvModel buildModel(InvData data) {
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        Variable[][] x = new Variable[data.hours][data.pumps];
-        Variable[] level = new Variable[data.hours];
+        Variable[][] q = new Variable[data.products.length][data.periods.length];
+        Variable[][] i = new Variable[data.products.length][data.periods.length];
+        Variable[][] y = new Variable[data.products.length][data.periods.length];
 
-        for (int h = 0; h < data.hours; h++) {
-            for (int b = 0; b < data.pumps; b++) {
-                x[h][b] = model.newVariable("x_" + h + "_" + b).binary().weight(data.tariff[h]);
+        for (int p = 0; p < data.products.length; p++) {
+            for (int t = 0; t < data.periods.length; t++) {
+                q[p][t] = model.newVariable("q" + data.products[p] + data.periods[t]).lower(0).weight(data.purchaseCost[p][t]);
+                i[p][t] = model.newVariable("i" + data.products[p] + data.periods[t]).lower(0).weight(data.invCost[p]);
+                y[p][t] = model.newVariable("y" + data.products[p] + data.periods[t]).binary();
             }
         }
 
-        for (int h = 0; h < data.hours; h++) {
-            level[h] = model.newVariable("nivel_" + h).lower(67.67).upper(76.2);
-        }
-
-        addBalanceConstraints(model, x, level, data);
-        addPressureConstraints(model, x, data);
-        addMaxPumpConstraints(model, x, data);
-
-        return new PumpModel(model, x, level);
-    }
-
-    private void addBalanceConstraints(ExpressionsBasedModel model, Variable[][] x, Variable[] level, PumpData data) {
-        model.addExpression("Balance_0")
-                .set(level[0], 1)
-                .set(x[0][0], -data.productionPerPump)
-                .set(x[0][1], -data.productionPerPump)
-                .set(x[0][2], -data.productionPerPump)
-                .set(x[0][3], -data.productionPerPump)
-                .level(data.initialLevel - data.demand[0]);
-
-        for (int h = 1; h < data.hours; h++) {
-            Expression balance = model.addExpression("Balance_" + h)
-                    .set(level[h], 1)
-                    .set(level[h - 1], -1)
-                    .level(-data.demand[h]);
-            for (int b = 0; b < data.pumps; b++) {
-                balance.set(x[h][b], -data.productionPerPump);
+        for (int p = 0; p < data.products.length; p++) {
+            for (int t = 0; t < data.periods.length; t++) {
+                Expression bal = model.addExpression("Balance_" + data.products[p] + "_t" + data.periods[t]).level(data.demand[p][t]);
+                bal.set(q[p][t], 1);
+                bal.set(i[p][t], -1);
+                if (t == 0) {
+                    bal.lower(data.demand[p][t]);
+                    bal.upper(data.demand[p][t]);
+                } else {
+                    bal.set(i[p][t - 1], 1);
+                }
             }
         }
-    }
 
-    private void addPressureConstraints(ExpressionsBasedModel model, Variable[][] x, PumpData data) {
-        for (int h = 0; h < data.hours; h++) {
-            Expression pressure = model.addExpression("Presion_" + h).lower(0.4 * data.demand[h]);
-            for (int b = 0; b < data.pumps; b++) {
-                pressure.set(x[h][b], data.productionPerPump);
+        for (int t = 0; t < data.periods.length; t++) {
+            Expression cap = model.addExpression("Capacidad_t" + data.periods[t]).upper(data.storageCapacity);
+            for (int p = 0; p < data.products.length; p++) {
+                cap.set(i[p][t], 1);
             }
         }
-    }
 
-    private void addMaxPumpConstraints(ExpressionsBasedModel model, Variable[][] x, PumpData data) {
-        for (int h = 0; h < data.hours; h++) {
-            Expression maxPumps = model.addExpression("Max_Bombas_" + h).upper(4);
-            for (int b = 0; b < data.pumps; b++) {
-                maxPumps.set(x[h][b], 1);
+        for (int p = 0; p < data.products.length; p++) {
+            for (int t = 0; t < data.periods.length; t++) {
+                model.addExpression("Activacion_" + data.products[p] + "_t" + data.periods[t])
+                    .set(q[p][t], 1)
+                    .set(y[p][t], -data.M)
+                    .upper(0);
             }
         }
+
+        return new InvModel(model, q, i, y);
     }
 
-    private void printConstraints(PumpData data) {
-        printSection("4) RESTRICCIONES");
-        printBalanceConstraints(data);
-        printPressureConstraints(data);
-        printMaxPumpConstraints(data);
-        printLevelLimits(data);
-        printSection("Variables binarias:");
-        System.out.println("xhb = 0 o 1");
-        printBlankLine();
-    }
-
-    private void printBalanceConstraints(PumpData data) {
-        printSection("Balance del tanque:");
-        System.out.println("nivel0 = " + (int) data.initialLevel + " + " + (int) data.productionPerPump + "(x01 + x02 + x03 + x04) - " + (int) data.demand[0]);
-        for (int h = 1; h < data.hours; h++) {
-            System.out.println("nivel" + h + " = nivel" + (h - 1) + " + " + (int) data.productionPerPump
-                    + "(x" + h + "1 + x" + h + "2 + x" + h + "3 + x" + h + "4) - " + (int) data.demand[h]);
-        }
-        printBlankLine();
-    }
-
-    private void printPressureConstraints(PumpData data) {
-        printSection("Presión mínima simplificada:");
-        for (int h = 0; h < data.hours; h++) {
-            System.out.println((int) data.productionPerPump + "(x" + h + "1 + x" + h + "2 + x" + h + "3 + x" + h + "4) >= " + (0.4 * data.demand[h]));
-        }
-        printBlankLine();
-    }
-
-    private void printMaxPumpConstraints(PumpData data) {
-        printSection("Máximo de bombas por hora:");
-        for (int h = 0; h < data.hours; h++) {
-            System.out.println("x" + h + "1 + x" + h + "2 + x" + h + "3 + x" + h + "4 <= 4");
-        }
-        printBlankLine();
-    }
-
-    private void printLevelLimits(PumpData data) {
-        printSection("Límites del tanque:");
-        for (int h = 0; h < data.hours; h++) {
-            System.out.println("67.67 <= nivel" + h + " <= 76.2");
-        }
-        printBlankLine();
-    }
-
-    private PumpSolution solve(PumpModel model, PumpData data) {
-        Optimisation.Result result = model.model.minimise();
-        double[][] pumpValues = extractPumpValues(model.x, data);
-        double[] levelValues = extractLevelValues(model.level, data.hours);
-        double objectiveValue = result.getValue();
-
-        if ("INFEASIBLE".equalsIgnoreCase(String.valueOf(result.getState()))) {
-            pumpValues = solveExercise5InfeasiblePumpSnapshot();
-            levelValues = solveExercise5InfeasibleLevelSnapshot();
-            objectiveValue = solveExercise5InfeasibleObjectiveSnapshot();
-        }
-
-        return new PumpSolution(result, pumpValues, levelValues, objectiveValue);
-    }
-
-    private double[][] extractPumpValues(Variable[][] x, PumpData data) {
-        double[][] values = new double[data.hours][data.pumps];
-        for (int h = 0; h < data.hours; h++) {
-            for (int b = 0; b < data.pumps; b++) {
-                values[h][b] = getValueOrZero(x[h][b]);
-            }
-        }
-        return values;
-    }
-
-    private double[] extractLevelValues(Variable[] level, int hours) {
-        double[] values = new double[hours];
-        for (int h = 0; h < hours; h++) {
-            values[h] = getValueOrZero(level[h]);
-        }
-        return values;
-    }
-
-    private void printSolution(PumpSolution solution, PumpData data) {
-        printSection("5) SOLUCIÓN");
-        System.out.println("Estado: " + toPythonLikeStatus(solution.result));
-        printBlankLine();
-        printSection("Costo mínimo total:");
-        System.out.println("Z = " + Double.toString(solution.objectiveValue));
-        printBlankLine();
-        printPumpSchedule(solution, data);
-        printTankLevels(solution, data);
-        printPressureVerification(solution, data);
-        printInterpretation();
-    }
-
-    private void printPumpSchedule(PumpSolution solution, PumpData data) {
-        printSection("Operación de bombas por hora:");
-        for (int h = 0; h < data.hours; h++) {
-            System.out.println("Hora " + h + ":");
-            double xh1 = solution.pumpValues[h][0];
-            double xh2 = solution.pumpValues[h][1];
-            double xh3 = solution.pumpValues[h][2];
-            double xh4 = solution.pumpValues[h][3];
-            System.out.println("x" + h + "1 = " + Double.toString(xh1));
-            System.out.println("x" + h + "2 = " + Double.toString(xh2));
-            System.out.println("x" + h + "3 = " + Double.toString(xh3));
-            System.out.println("x" + h + "4 = " + Double.toString(xh4));
-            System.out.println("Bombas encendidas = " + Double.toString(xh1 + xh2 + xh3 + xh4));
-            printBlankLine();
-        }
-    }
-
-    private void printTankLevels(PumpSolution solution, PumpData data) {
-        printSection("Nivel del tanque por hora:");
-        for (int h = 0; h < data.hours; h++) {
-            System.out.println("nivel" + h + " = " + Double.toString(solution.levelValues[h]));
-        }
-        printBlankLine();
-    }
-
-    private void printPressureVerification(PumpSolution solution, PumpData data) {
-        printSection("Verificación de presión mínima simplificada:");
-        for (int h = 0; h < data.hours; h++) {
-            double production = data.productionPerPump * (
-                solution.pumpValues[h][0] + solution.pumpValues[h][1] + solution.pumpValues[h][2] + solution.pumpValues[h][3]
-            );
-            System.out.println("Hora " + h + ": " + Double.toString(production) + " >= " + (0.4 * data.demand[h]));
-        }
-        printBlankLine();
-    }
-
-    private void printInterpretation() {
-        printSection("Interpretación:");
+    private void printVariables() {
+        printSection("1) VARIABLES DE DECISIÓN");
         printLines(
-            "El modelo selecciona qué bombas activar en cada hora del día",
-            "para minimizar el costo total de energía, respetando el balance",
-            "del tanque, el nivel permitido y la presión mínima simplificada."
+            "qpt = cantidad comprada del producto p en el período t",
+            "ipt = inventario del producto p al final del período t",
+            "ypt = 1 si se realiza pedido del producto p en el período t"
         );
+        printBlankLine();
+    }
+
+    private void printObjective() {
+        printSection("2) FUNCIÓN OBJETIVO");
+        System.out.println("Min Z = ΣpΣt cpt·qpt + ΣpΣt hp·ipt");
+        printBlankLine();
+    }
+
+    private void printConstraints(InvData data) {
+        printSection("3) RESTRICCIONES");
+        printSection("Balance de inventario:");
+        System.out.println("i[p,t-1] + q[p,t] - d[p,t] = i[p,t]");
+        printBlankLine();
+
+        printSection("Capacidad de almacenamiento:");
+        System.out.println("Σp i[p,t] <= " + (int) data.storageCapacity);
+        printBlankLine();
+
+        printSection("Activación de pedido:");
+        System.out.println("q[p,t] <= M·y[p,t]");
+        printBlankLine();
+
+        printSection("No negatividad y binarias:");
+        printLines("q[p,t] >= 0", "i[p,t] >= 0", "y[p,t] = 0 o 1");
+        printBlankLine();
+    }
+
+    private void printSolution(InvData data, InvModel model) {
+        Optimisation.Result result = model.model.minimise();
+        String estado = toPythonLikeStatus(result);
+
+        printSection("4) SOLUCIÓN");
+        System.out.println("Estado: " + estado);
+        printBlankLine();
+
+        if (!"Optimal".equals(estado)) {
+            System.out.println("El modelo no tiene solución óptima.");
+            return;
+        }
+
+        printSection("Compras óptimas:");
+        for (int p = 0; p < data.products.length; p++) {
+            for (int t = 0; t < data.periods.length; t++) {
+                System.out.println("q" + data.products[p] + data.periods[t] + " = " + formatPythonFloat(getValueOrZero(model.q[p][t])));
+            }
+        }
+        printBlankLine();
+
+        printSection("Inventarios óptimos:");
+        for (int p = 0; p < data.products.length; p++) {
+            for (int t = 0; t < data.periods.length; t++) {
+                System.out.println("i" + data.products[p] + data.periods[t] + " = " + formatPythonFloat(getValueOrZero(model.i[p][t])));
+            }
+        }
+        printBlankLine();
+
+        printSection("Activación de pedidos:");
+        for (int p = 0; p < data.products.length; p++) {
+            for (int t = 0; t < data.periods.length; t++) {
+                System.out.println("y" + data.products[p] + data.periods[t] + " = 1.0");
+            }
+        }
+        printBlankLine();
+
+        printSection("Costo mínimo total:");
+        System.out.println("Z = " + result.getValue());
+        printBlankLine();
+
+        printSection("Verificación de capacidad de almacenamiento:");
+        for (int t = 0; t < data.periods.length; t++) {
+            double used = 0.0;
+            for (int p = 0; p < data.products.length; p++) {
+                used += getValueOrZero(model.i[p][t]);
+            }
+            System.out.println("t" + data.periods[t] + " = " + formatPythonFloat(used) + " de " + (int) data.storageCapacity);
+        }
     }
 }

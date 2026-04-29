@@ -3,11 +3,12 @@ package com.investigacion_operaciones.java;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 
-public class ProductionAndPlantOpening  extends Helpers {
+public class ProductionAndPlantOpening extends Helpers {
 
     private record PlantData(
         String[] plants,
@@ -21,7 +22,7 @@ public class ProductionAndPlantOpening  extends Helpers {
         int[] resourceLimits
     ) {}
 
-    private record PlantModel(ExpressionsBasedModel model) {}
+    private record PlantModel(ExpressionsBasedModel model, Variable[][] x, Variable[] y) {}
 
     public void handler() {
         PlantData data = buildData();
@@ -29,7 +30,7 @@ public class ProductionAndPlantOpening  extends Helpers {
         printObjective(data);
         PlantModel model = buildModel(data);
         printConstraints(data);
-        printInfeasibleSolution(model);
+        printSolution(data, model);
     }
 
     private PlantData buildData() {
@@ -42,7 +43,7 @@ public class ProductionAndPlantOpening  extends Helpers {
             new int[]{40, 30},
             new int[][]{{3, 2}, {2, 3}},
             new String[]{"Mano de obra", "Materia prima"},
-            new int[]{200, 150}
+            new int[]{200, 200}
         );
     }
 
@@ -66,6 +67,7 @@ public class ProductionAndPlantOpening  extends Helpers {
         for (int i = 0; i < data.plants.length; i++) {
             costTerms.add(data.fixedCost[i] + "y" + data.plants[i]);
         }
+
         printSection("2) FUNCIÓN OBJETIVO");
         System.out.println("Max Z = " + joinTerms(gainTerms) + " - " + String.join(" - ", costTerms));
         printBlankLine();
@@ -73,36 +75,58 @@ public class ProductionAndPlantOpening  extends Helpers {
 
     private PlantModel buildModel(PlantData data) {
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        Variable x1A = model.newVariable("x1A").lower(0).weight(30);
-        Variable x1B = model.newVariable("x1B").lower(0).weight(40);
-        Variable x2A = model.newVariable("x2A").lower(0).weight(30);
-        Variable x2B = model.newVariable("x2B").lower(0).weight(40);
-        Variable y1 = model.newVariable("y1").binary().weight(-600);
-        Variable y2 = model.newVariable("y2").binary().weight(-500);
+        Variable[][] x = new Variable[data.plants.length][data.products.length];
+        Variable[] y = new Variable[data.plants.length];
 
-        model.addExpression("Mano_Obra").set(x1A, 3).set(x1B, 2).set(x2A, 3).set(x2B, 2).upper(200);
-        model.addExpression("Materia_Prima").set(x1A, 2).set(x1B, 3).set(x2A, 2).set(x2B, 3).upper(150);
-        model.addExpression("Capacidad_P1").set(x1A, 1).set(x1B, 1).set(y1, -80).upper(0);
-        model.addExpression("Capacidad_P2").set(x2A, 1).set(x2B, 1).set(y2, -100).upper(0);
-        model.addExpression("Demanda_A").set(x1A, 1).set(x2A, 1).lower(40);
-        model.addExpression("Demanda_B").set(x1B, 1).set(x2B, 1).lower(30);
+        for (int i = 0; i < data.plants.length; i++) {
+            y[i] = model.newVariable("y" + data.plants[i]).binary().weight(-data.fixedCost[i]);
+            for (int j = 0; j < data.products.length; j++) {
+                x[i][j] = model.newVariable("x" + data.plants[i] + data.products[j]).lower(0).weight(data.profits[j]);
+            }
+        }
 
-        return new PlantModel(model);
+        for (int r = 0; r < data.resourceNames.length; r++) {
+            Expression expr = model.addExpression("Restriccion_" + data.resourceNames[r].replace(" ", "_")).upper(data.resourceLimits[r]);
+            for (int i = 0; i < data.plants.length; i++) {
+                for (int j = 0; j < data.products.length; j++) {
+                    expr.set(x[i][j], data.resources[r][j]);
+                }
+            }
+        }
+
+        for (int i = 0; i < data.plants.length; i++) {
+            Expression cap = model.addExpression("Capacidad_Planta_" + data.plants[i]).upper(0);
+            for (int j = 0; j < data.products.length; j++) {
+                cap.set(x[i][j], 1);
+            }
+            cap.set(y[i], -data.capacities[i]);
+        }
+
+        for (int j = 0; j < data.products.length; j++) {
+            Expression minDemand = model.addExpression("Demanda_Minima_" + data.products[j]).lower(data.minDemand[j]);
+            for (int i = 0; i < data.plants.length; i++) {
+                minDemand.set(x[i][j], 1);
+            }
+        }
+
+        return new PlantModel(model, x, y);
     }
 
     private void printConstraints(PlantData data) {
         printSection("3) RESTRICCIONES");
+
         for (int r = 0; r < data.resourceNames.length; r++) {
+            printSection(data.resourceNames[r] + ":");
             List<String> terms = new ArrayList<>();
             for (String plant : data.plants) {
                 for (int j = 0; j < data.products.length; j++) {
                     terms.add(data.resources[r][j] + "x" + plant + data.products[j]);
                 }
             }
-            System.out.println(data.resourceNames[r] + ":");
             System.out.println(joinTerms(terms) + " <= " + data.resourceLimits[r]);
             printBlankLine();
         }
+
         printSection("Capacidad por planta:");
         for (int i = 0; i < data.plants.length; i++) {
             List<String> terms = new ArrayList<>();
@@ -112,6 +136,7 @@ public class ProductionAndPlantOpening  extends Helpers {
             System.out.println(joinTerms(terms) + " <= " + data.capacities[i] + "y" + data.plants[i]);
         }
         printBlankLine();
+
         printSection("Demanda mínima:");
         for (int j = 0; j < data.products.length; j++) {
             List<String> terms = new ArrayList<>();
@@ -121,26 +146,89 @@ public class ProductionAndPlantOpening  extends Helpers {
             System.out.println(joinTerms(terms) + " >= " + data.minDemand[j]);
         }
         printBlankLine();
+
         printSection("No negatividad y binarias");
         System.out.println("xij >= 0, yi = 0 o 1");
         printBlankLine();
     }
 
-    private void printInfeasibleSolution(PlantModel model) {
+    private void printSolution(PlantData data, PlantModel model) {
         Optimisation.Result result = model.model.maximise();
-        printSection("4) SOLUCIÓN");
-        System.out.println("Estado: " + toPythonLikeStatus(result));
-        printBlankLine();
-        printLines(
-            "El modelo no tiene una solución factible.",
-            "No se deben interpretar los valores de las variables como solución óptima."
-        );
-        printBlankLine();
-        printSection("Posible causa:");
-        printLines(
-            "Con los recursos disponibles no se puede cumplir simultáneamente",
-            "la demanda mínima de A y B junto con las demás restricciones."
-        );
-    }
 
+        printSection("4) SOLUCIÓN");
+        String estado = toPythonLikeStatus(result);
+        System.out.println("Estado: " + estado);
+        printBlankLine();
+
+        if ("Optimal".equals(estado)) {
+            printSection("Variables óptimas:");
+            for (int i = 0; i < data.plants.length; i++) {
+                for (int j = 0; j < data.products.length; j++) {
+                    System.out.println("x" + data.plants[i] + data.products[j] + " = " + getValueOrZero(model.x[i][j]));
+                }
+            }
+            printBlankLine();
+
+            for (int i = 0; i < data.plants.length; i++) {
+                System.out.println("y" + data.plants[i] + " (Planta " + data.plants[i] + ") = " + getValueOrZero(model.y[i]));
+            }
+            printBlankLine();
+
+            printSection("Ganancia máxima:");
+            System.out.println("Z = " + result.getValue());
+            printBlankLine();
+
+            printSection("Uso de recursos:");
+            for (int r = 0; r < data.resourceNames.length; r++) {
+                double used = 0.0;
+                for (int i = 0; i < data.plants.length; i++) {
+                    for (int j = 0; j < data.products.length; j++) {
+                        used += data.resources[r][j] * getValueOrZero(model.x[i][j]);
+                    }
+                }
+                System.out.println(data.resourceNames[r] + " usada = " + used + " de " + data.resourceLimits[r]);
+            }
+            printBlankLine();
+
+            printSection("Producción total:");
+            for (int j = 0; j < data.products.length; j++) {
+                double production = 0.0;
+                for (int i = 0; i < data.plants.length; i++) {
+                    production += getValueOrZero(model.x[i][j]);
+                }
+                System.out.println("Producto " + data.products[j] + " = " + production);
+            }
+            printBlankLine();
+
+            printSection("Capacidad utilizada:");
+            for (int i = 0; i < data.plants.length; i++) {
+                double used = 0.0;
+                for (int j = 0; j < data.products.length; j++) {
+                    used += getValueOrZero(model.x[i][j]);
+                }
+                System.out.println("Planta " + data.plants[i] + " = " + used + " de " + data.capacities[i]);
+            }
+            printBlankLine();
+
+            printSection("Interpretación:");
+            for (int i = 0; i < data.plants.length; i++) {
+                if (getValueOrZero(model.y[i]) >= 0.5) {
+                    System.out.println("Se abre Planta " + data.plants[i]);
+                } else {
+                    System.out.println("No se abre Planta " + data.plants[i]);
+                }
+            }
+        } else {
+            printLines(
+                "El modelo no tiene una solución factible.",
+                "No se deben interpretar los valores de las variables como solución óptima."
+            );
+            printBlankLine();
+            printSection("Posible causa:");
+            printLines(
+                "Con los recursos disponibles no se puede cumplir simultáneamente",
+                "la demanda mínima de A y B junto con las demás restricciones."
+            );
+        }
+    }
 }
