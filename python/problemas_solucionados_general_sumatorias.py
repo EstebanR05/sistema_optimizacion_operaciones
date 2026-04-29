@@ -680,7 +680,7 @@ recursos = {
     },
     "Materia prima": {
         "unidad": "kg",
-        "disponible": 150
+        "disponible": 200
     }
 }
 
@@ -897,7 +897,7 @@ Medicamentos tipo A (ej. antibióticos 1)
 Medicamentos tipo B (ej. antibióticos 2)
 
 ### Períodos:
-t=1,2,3t = 1, 2, 3t=1,2,3
+t=1,2,3
 
 ### Costos de compra (por unidad):
 Producto A: 10, 12, 11  
