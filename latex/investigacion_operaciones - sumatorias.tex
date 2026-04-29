@@ -1,9 +1,9 @@
-\documentclass[12pt,a4paper]{article}
+\documentclass[12pt,letterpaper]{article}
 
 \usepackage[spanish,es-tabla]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
+\usepackage{newtxtext,newtxmath}
 \usepackage{geometry}
 \usepackage{setspace}
 \usepackage{amsmath,amssymb}
@@ -15,12 +15,11 @@
 \usepackage{microtype}
 \usepackage{hyperref}
 \usepackage{fancyhdr}
-\usepackage{lastpage}
 
-\geometry{margin=2.5cm}
-\onehalfspacing
-\setlength{\parindent}{1.25cm}
-\setlength{\parskip}{0.15cm}
+\geometry{margin=2.54cm}
+\doublespacing
+\setlength{\parindent}{1.27cm}
+\setlength{\parskip}{0pt}
 
 \hypersetup{
 	colorlinks=true,
@@ -32,46 +31,39 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small unicomfacauca}
-\fancyhead[R]{\small Investigación de Operaciones}
-\fancyfoot[C]{\small Página \thepage\ de \pageref{LastPage}}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{14.5pt}
 
 \begin{document}
 
-% ---------------- PORTADA ----------------
 \begin{titlepage}
 	\centering
-	\vspace*{1.5cm}
+	\vspace*{2cm}
 
-	{\Large \textbf{UNICOMFACAUCA}}\\[0.4cm]
-	{\large Fundación Universitaria de Popayán (unicomfacauca)}\\[1.2cm]
+	{\large UNICOMFACAUCA}\\[0.3cm]
+	{\large Fundación Universitaria de Popayán}\\[2.2cm]
 
-	{\large \textbf{Informe académico de entrega}}\\[0.3cm]
-	{\Large \textbf{Comparación de implementaciones de optimización en Python y Java}}\\[0.2cm]
-	{\large Investigación de Operaciones aplicada a seis ejercicios de distinta complejidad}\\[1.3cm]
+	{\Large \textbf{Comparación de implementaciones de optimización en Python y Java}}\\[0.5cm]
+	{\large Investigación de Operaciones aplicada a seis ejercicios de distinta complejidad}\\[2cm]
 
-	\begin{flushleft}
-		{\bfseries Estudiantes:}\\
-		Emanuel Esteban Restrepo Patarroyo\\
-		Ariana Marcela Andrade Bello\\[0.6cm]
+	Emanuel Esteban Restrepo Patarroyo\\
+	Ariana Marcela Andrade Bello\\[0.8cm]
 
-		{\bfseries Docente:}\\
-		Alejandro Benítez Garzon\\[0.6cm]
+	Investigación de Operaciones\\
+	Alejandro Benítez Garzon\\[0.8cm]
 
-		{\bfseries Asignatura:}\\
-		Investigación de Operaciones\\[0.6cm]
+	Ingeniería de Sistemas\\
+	UNICOMFACAUCA\\[0.8cm]
 
-		{\bfseries Proyecto:}\\
-		Sistema de Optimización
-	\end{flushleft}
+	Sistema de Optimización
 
 	\vfill
 	{\large Popayán, Colombia}\\
-	{\large 22 de abril de 2026}
+	{\large 29 de abril de 2026}
 \end{titlepage}
 
 \tableofcontents
-\newpage
 \newpage
 
 \section{Introducción}
@@ -248,7 +240,7 @@ En conjunto, estos enfoques evidencian la importancia de integrar técnicas mate
 		\hline
 		Recursos disponibles & Mano de obra & 200 horas \\
 		\hline
-		Recursos disponibles & Materia prima & 150 kg \\
+		Recursos disponibles & Materia prima & 200 kg \\
 		\hline
 		Requerimientos por unidad & Producto A & 3 horas, 2 kg \\
 		\hline
@@ -378,7 +370,7 @@ En conjunto, estos enfoques evidencian la importancia de integrar técnicas mate
 
 \textbf{Nivel de complejidad} Este problema es de nivel difícil, ya que integra decisiones interdependientes en múltiples períodos, incluyendo variables continuas (producción, transporte, inventario) y binarias (activación de producción). Se trata de un modelo de programación entera mixta multi-período, con alta dimensión y complejidad estructural.
 
-\section{Formulacion Matematica}
+\section{Formulación Matemática}
 
 La formulación matemática presentada a continuación conserva el mismo modelo implementado en Python, pero resumida únicamente en términos de parámetros, variables, función objetivo y restricciones.
 
@@ -504,21 +496,20 @@ y_b\in\{0,1\},\qquad \forall b\in B.
 \subsection{Ejercicio 4: Producción con apertura de plantas (PLEM)}
 
 \subsubsection*{Parámetros}
-\[
-P=\{1,2\}\ (\text{plantas}),\qquad
-J=\{A,B\}\ (\text{productos}),\qquad
-R=\{\text{mano de obra},\text{materia prima}\},
-\]
-\[
-u_j=\text{utilidad por unidad del producto } j,\quad
-f_p=\text{costo fijo de apertura de la planta } p,\quad
-K_p=\text{capacidad de la planta } p,
-\]
-\[
-a_{rj}=\text{consumo del recurso } r \text{ por unidad de } j,\quad
-\bar{R}_r=\text{disponibilidad del recurso } r,\quad
-d_j^{\min}=\text{demanda mínima de } j.
-\]
+\begin{align*}
+P&=\{1,2\}\ (\text{plantas}), & J&=\{A,B\}\ (\text{productos}), \\
+R&=\{\text{mano de obra},\text{materia prima}\}
+\end{align*}
+\begin{align*}
+u_j&=\text{utilidad por unidad del producto } j,\\
+f_p&=\text{costo fijo de apertura de la planta } p,\\
+K_p&=\text{capacidad de la planta } p
+\end{align*}
+\begin{align*}
+a_{rj}&=\text{consumo del recurso } r \text{ por unidad de } j,\\
+\bar{R}_r&=\text{disponibilidad del recurso } r,\\
+d_j^{\min}&=\text{demanda mínima de } j
+\end{align*}
 
 \subsubsection*{Variables}
 \[
@@ -741,7 +732,7 @@ Además del valor de la solución óptima, el análisis permitió identificar re
 
 En términos generales, Python se confirma como una herramienta adecuada para aprendizaje, prototipado y validación rápida, mientras que Java con ojAlgo ofrece mejores condiciones para escalabilidad, organización del código e integración empresarial. En conjunto, el trabajo fortaleció competencias clave como modelación matemática, implementación computacional, análisis crítico de resultados y toma de decisiones basada en datos.
 
-\section{Referencia en formato}
+\section{Referencias}
 
 \begin{itemize}[leftmargin=*]
 	\item Gutiérrez-Bahamondes, J. H., Salgueiro, Y., Silva-Rubio, S. A., Alsina, M. A., Mora-Meliá, D., \& Fuertes-Miquel, V. S. (2019). jHawanet: An open-source project for the implementation and assessment of multi-objective evolutionary algorithms on water distribution networks. \url{https://doi.org/10.3390/w11102018}
