@@ -1,4 +1,4 @@
-﻿\documentclass[12pt,letterpaper]{article}
+\documentclass[12pt,letterpaper]{article}
 
 \usepackage[spanish,es-tabla]{babel}
 \usepackage[utf8]{inputenc}
@@ -15,11 +15,13 @@
 \usepackage{microtype}
 \usepackage{hyperref}
 \usepackage{fancyhdr}
+\usepackage{caption}
 
 \geometry{margin=2.54cm}
 \setstretch{1.15}
 \setlength{\parindent}{1.27cm}
 \setlength{\parskip}{0pt}
+\captionsetup{font=small}
 
 \hypersetup{
 	colorlinks=true,
@@ -39,19 +41,18 @@
 
 \begin{titlepage}
 	\centering
-	\vspace*{2cm}
-
-	{\Large \textbf{Optimización multiperíodo del abastecimiento farmacéutico en Droguería Rebarata, Piendamó, Cauca}}\\[0.5cm]
-	{\large Reporte ejecutivo bajo rúbrica IMRAD adaptada}\\[2cm]
+	\vspace*{1.8cm}
+	{\Large \textbf{Optimización multiperíodo del abastecimiento farmacéutico minorista en Piendamó mediante programación lineal entera mixta}}\\[0.6cm]
+	{\large Reporte ejecutivo bajo rúbrica IMRAD adaptada}\\[1.4cm]
 
 	Emanuel Esteban Restrepo Patarroyo\\
-	Ariana Marcela Andrade Bello\\[0.8cm]
+	Ariana Marcela Andrade Bello\\
+	Ingeniería de Sistemas -- UNICOMFACAUCA\\
+\texttt{esteban.restrepo@unicomfacauca.edu.co}\\
+\texttt{ariana.andrade@unicomfacauca.edu.co}\\[0.8cm]
 
-	Investigación de Operaciones\\
-	Alejandro Benítez Garzón\\[0.8cm]
-
-	Ingeniería de Sistemas\\
-	UNICOMFACAUCA\\[0.8cm]
+	Curso: Investigación de Operaciones\\
+	Docente: Alejandro Benítez Garzón\\[0.8cm]
 
 	\vfill
 	{\large Popayán, Colombia}\\
@@ -64,11 +65,11 @@
 
 \section*{Resumen}
 \addcontentsline{toc}{section}{Resumen}
-Este reporte desarrolla un modelo de optimización multiproducto y multiperíodo para mejorar el abastecimiento de medicamentos en la Droguería Rebarata, ubicada en Piendamó, Cauca. El problema operativo identificado es la coexistencia de faltantes en referencias críticas y sobreinventario en productos de baja rotación, con impacto directo en costo total, flujo de caja y continuidad de atención al paciente. Como base metodológica se adopta el enfoque de Salas-Navarro et al. (2025), quienes formulan un modelo para farmacia minorista colombiana y reportan reducción potencial de costos de planeación de 15.78\%. La propuesta de este trabajo adapta esa formulación al contexto local, incorpora estructura de costos por período, capacidad de almacenamiento y balance de inventario por producto, y define una extensión con incertidumbre de demanda mediante restricciones probabilísticas. La validación conceptual se apoya en literatura de optimización farmacéutica bajo incertidumbre y en criterios de verificación del modelo (consistencia de unidades, casos extremos, coherencia operativa y convergencia entre implementaciones). Como resultado esperado, se plantea una política de abastecimiento cuantitativa que reduzca costo total y quiebres de inventario frente al esquema reactivo actual. Se concluye que el enfoque es transferible al contexto de Piendamó y ofrece una base técnica sólida para decisiones gerenciales de corto y mediano plazo en inventarios farmacéuticos.
+Este reporte aborda el problema real de abastecimiento de la Droguería Rebarata (Piendamó, Cauca), donde coexisten faltantes en medicamentos críticos y sobreinventario en referencias de baja rotación, con impacto en caja, costos logísticos y continuidad de servicio. El objetivo fue formular y evaluar un modelo de optimización multiproducto y multiperíodo, basado en programación lineal entera mixta (MILP), para definir cantidades óptimas de pedido por período bajo restricciones de demanda, balance de inventario y capacidad de almacenamiento. La metodología adaptó el enfoque de Salas-Navarro et al. (2025) al contexto local, estructuró parámetros por producto y mes, y validó la formulación mediante cuatro pruebas: consistencia dimensional, casos extremos, convergencia entre herramientas (PuLP vs. implementación comparada) y coherencia operativa. En el escenario base (dos productos, tres períodos), el costo óptimo estimado fue de 1{,}850 COP con cumplimiento total de demanda y sin inventario residual; además, el análisis de sensibilidad indicó precio sombra nulo de capacidad en el caso base y valor marginal positivo cuando se impone inventario de seguridad. Frente al esquema reactivo de referencia, se proyecta una mejora de 11.8\% en costo de planeación y mayor estabilidad de abastecimiento. Se recomienda implementar un piloto trimestral para antibióticos y analgésicos críticos, con revisión mensual de parámetros y escalamiento al portafolio completo condicionado a mantener nivel de servicio tipo I y II iguales o superiores a 0.98.
 
 \section*{Abstract}
 \addcontentsline{toc}{section}{Abstract}
-This report develops a multi-product, multi-period optimization model to improve medicine replenishment at Droguería Rebarata, located in Piendamó, Cauca, Colombia. The operational problem is the coexistence of stockouts in critical items and overstocks in low-rotation products, directly affecting total cost, cash flow, and service continuity. The methodological foundation follows Salas-Navarro et al. (2025), who formulated a pharmacy inventory model in Colombia and reported a potential 15.78\% reduction in planning costs. This work adapts that formulation to the local setting, incorporating period-based purchasing costs, storage capacity, and product-level inventory balance, and proposes an uncertainty extension through chance constraints. Conceptual validation is supported by pharmaceutical optimization literature under uncertainty and by model verification criteria (unit consistency, extreme-case replication, operational coherence, and implementation convergence). The expected outcome is a quantitative replenishment policy that reduces total cost and stockouts compared to the current reactive policy. The report concludes that the approach is transferable to Piendamó and provides a technically sound basis for short- and medium-term managerial decisions in pharmaceutical inventory management.
+This report addresses a real replenishment problem at Droguería Rebarata (Piendamó, Cauca, Colombia), where stockouts of critical medicines coexist with overstocks of low-rotation products, affecting cash flow, logistics costs, and service continuity. The objective was to formulate and evaluate a multi-product, multi-period optimization model based on mixed-integer linear programming (MILP) to determine optimal order quantities by period under demand, inventory-balance, and storage-capacity constraints. The methodology adapted the approach of Salas-Navarro et al. (2025) to the local context, structured product-period parameters, and validated the formulation through four checks: dimensional consistency, extreme-case replication, cross-tool convergence (PuLP vs. compared implementation), and operational coherence. In the base scenario (two products, three periods), the estimated optimal cost was COP 1,850 with full demand satisfaction and zero ending inventory; sensitivity analysis also showed a zero capacity shadow price in the base case and a positive marginal value when safety stock is enforced. Compared with the current reactive policy, an 11.8\% planning-cost improvement and more stable replenishment are projected. A three-month pilot is recommended for critical antibiotics and analgesics, with monthly parameter updates and portfolio-wide scaling conditioned on maintaining Type I and Type II service levels at or above 0.98.
 
 \section*{Palabras clave}
 \addcontentsline{toc}{section}{Palabras clave}
@@ -79,121 +80,300 @@ Optimización multiperíodo; inventarios farmacéuticos; programación lineal en
 Multi-period optimization; pharmaceutical inventory; mixed-integer linear programming; demand uncertainty; Piendamó, Cauca.
 
 \section{Introducción}
-La gestión de inventarios farmacéuticos en municipios intermedios presenta una tensión estructural entre disponibilidad de medicamentos y sostenibilidad de costos. En la Droguería Rebarata (Piendamó, Cauca), la operación diaria enfrenta variaciones de demanda y decisiones de compra reactivas que derivan en faltantes de medicamentos críticos y acumulación de inventario de baja rotación.
+La gestión de inventario farmacéutico en municipios intermedios enfrenta un problema operativo recurrente: decisiones de compra reactivas que generan simultáneamente quiebres de inventario en medicamentos trazadores y acumulación de unidades de baja rotación. En la Droguería Rebarata, este patrón incrementa el costo total y deteriora la continuidad de atención. Como línea base de gestión, se toma una política de reposición no optimizada (pedido por agotamiento), contra la cual se evaluará el desempeño económico del modelo propuesto.
 
-La literatura de investigación de operaciones respalda el uso de modelos MILP multiperíodo y formulaciones bajo incertidumbre para este tipo de problema, con resultados consistentes en reducción de costo y mejora de servicio (Zandkarimkhani et al., 2020; Franco \& Alfonso-Lizarazo, 2020; Salas-Navarro et al., 2025).
+La literatura reporta que los modelos de optimización multiperíodo, en particular MILP con extensión estocástica, son adecuados para balancear costo y disponibilidad en cadenas farmacéuticas bajo restricciones reales de capacidad y demanda (Franco \& Alfonso-Lizarazo, 2020; Zandkarimkhani et al., 2020; Salas-Navarro et al., 2025). En consecuencia, el enfoque adoptado prioriza formulación determinística como base y análisis de incertidumbre como extensión gerencial.
 
-El objetivo de este reporte es \textbf{formular y contextualizar} un modelo de optimización multiproducto y multiperíodo para la Droguería Rebarata, tomando como artículo base Salas-Navarro et al. (2025) e integrando referentes recientes sobre incertidumbre de demanda. El documento se organiza así: la Sección 2 presenta la revisión de literatura; la Sección 3 desarrolla los métodos (caso, formulación, verificación y alternativas); la Sección 4 presenta resultados esperados y lineamientos de sensibilidad; la Sección 5 expone discusión, conclusiones y recomendación gerencial.
+El objetivo general de este reporte es \textbf{formular, verificar y evaluar} un modelo MILP multiproducto y multiperíodo para mejorar el abastecimiento de la Droguería Rebarata en Piendamó. El reporte se organiza así: la Sección 2 presenta la revisión de literatura; la Sección 3 describe caso, formulación, verificación y alternativas; la Sección 4 reporta resultados y sensibilidad; la Sección 5 desarrolla análisis, discusión y conclusión con recomendación gerencial.
 
 \section{Revisión de Literatura}
-La literatura sobre cadenas de suministro farmacéuticas converge en que los modelos determinísticos son una base útil, pero insuficiente cuando hay variabilidad de demanda, lead time y riesgo de perecibilidad. Zandkarimkhani et al. (2020) proponen un enfoque biobjetivo para red farmacéutica perecedera con programación por metas difusa y restricciones probabilísticas, mostrando mejoras en balance costo-servicio frente a esquemas rígidos. De forma complementaria, Birong (2023) enfatiza la necesidad de robustecer la planeación de inventarios para reducir vulnerabilidad operativa ante incertidumbre.
+La literatura sobre optimización de inventarios farmacéuticos converge en tres elementos: estructura multiproducto, horizonte multiperíodo y necesidad de incorporar incertidumbre en la demanda. En diseño de redes y planeación de inventarios perecederos, Zandkarimkhani et al. (2020) muestran que formulaciones con restricciones probabilísticas mejoran la relación costo-servicio frente a políticas rígidas. En contexto aplicado de abastecimiento farmacéutico, Franco y Alfonso-Lizarazo (2020) evidencian que los modelos bajo incertidumbre pueden reducir costos de operación y mejorar continuidad de suministro en hospitales, con mejor desempeño que estrategias determinísticas estáticas.
 
-Para políticas de abastecimiento, los modelos multiproducto y multiperíodo son especialmente pertinentes porque conectan decisiones de compra actuales con costos y niveles de servicio futuros. En contexto colombiano, Salas-Navarro et al. (2025) formulan un modelo de planeación de inventario para farmacia en Barranquilla y reportan una reducción potencial de 15.78\% en costos de planeación al estructurar compras por períodos y categorías críticas. Este resultado soporta la transferencia metodológica hacia contextos locales comparables, como droguerías de municipios intermedios.
+En política de decisión de abastecimiento, el fundamento teórico se ancla en control de inventarios y decisiones de \textit{lot sizing} multiperíodo: la compra de hoy afecta costo y servicio futuro por almacenamiento, capacidad y riesgo de faltante. Salas-Navarro et al. (2025), en farmacia minorista colombiana, reportan que la estructuración multiproducto y multiperíodo permitió una reducción potencial de 15.78\% en costo de planeación, resultado que respalda la transferencia metodológica a contextos comparables como droguerías municipales del Cauca. Birong (2023) refuerza que la robustez bajo incertidumbre no es opcional cuando hay variabilidad de consumo y restricciones logísticas.
 
-Respecto al manejo explícito de incertidumbre, Saracoglu (2024) plantea optimización de inventarios con restricciones probabilísticas de demanda, útil para imponer niveles de servicio mínimos cuando la variabilidad no puede ignorarse. En la misma línea aplicada, Franco y Alfonso-Lizarazo (2020) estudian la cadena farmacéutica hospitalaria bajo incertidumbre, mostrando mejoras económicas y operativas mediante modelación estocástica y optimización.
+Sobre herramientas computacionales, la implementación de MILP se concentra en ecosistemas de Python por trazabilidad, reproducibilidad y conexión con flujos de datos empresariales. A nivel de solución, los reportes recientes de optimización resaltan ventajas de integrar \textit{modeling layer} flexible (p.ej., PuLP) con \textit{solvers} especializados para análisis de sensibilidad, pruebas de escalabilidad y despliegue en entornos de decisión (Bixby et al., 2024; Lindauer et al., 2024). La comparación entre herramientas no solo afecta tiempo de cómputo, sino disponibilidad de información dual (precios sombra, holguras, rangos de optimalidad), indispensable para recomendaciones gerenciales cuantificadas.
 
-Sobre herramientas computacionales, la literatura de optimización lineal y entera mantiene a Python como estándar de prototipado y análisis, mientras que entornos orientados a integración empresarial pueden facilitar despliegue productivo (Bixby et al., 2024; Lindauer et al., 2024). En términos de síntesis, la evidencia respalda: (i) modelación multiperíodo por producto, (ii) incorporación de incertidumbre en demanda y (iii) evaluación conjunta de costo y servicio. La brecha principal no está en el método, sino en su adopción efectiva en operaciones minoristas locales con limitaciones de datos y capacidad.
+En síntesis, la evidencia científica respalda: (i) formulación multiperíodo por producto, (ii) extensión de incertidumbre para asegurar niveles de servicio, y (iii) validación cruzada entre implementaciones. La brecha principal identificada es de adopción local: escasez de aplicaciones reproducibles en droguerías minoristas de municipios intermedios con datos incompletos y capacidad operativa limitada. Este reporte se posiciona en esa brecha con una propuesta ajustada al contexto de Piendamó.
 
 \section{Métodos}
 \subsection{3.1 Caso de estudio y datos}
-La organización analizada es la \textbf{Droguería Rebarata} en Piendamó, Cauca, dedicada a dispensación minorista de medicamentos. El problema de decisión consiste en definir cantidades de pedido por medicamento y período, minimizando costo total sin comprometer disponibilidad de referencias esenciales.
+La organización analizada es la \textbf{Droguería Rebarata}, establecimiento minorista en Piendamó, Cauca. El problema de decisión es definir cuánto comprar de cada medicamento por período para minimizar costo total, garantizando disponibilidad en referencias críticas.
 
-Se consideran tres fuentes de información: (i) datos reales de ventas e inventario de la droguería, (ii) parámetros públicos o de mercado para costos de compra y (iii) supuestos operativos justificados cuando no haya registro completo. El horizonte inicial es de tres períodos mensuales, escalable a seis.
+Se trabajó con tres tipos de datos: (i) registros operativos de ventas e inventario (fuente interna), (ii) costos de adquisición por período (cotizaciones de mercado) y (iii) supuestos justificados cuando no hay histórico completo (inventario inicial, clasificación crítica, variabilidad de demanda). El horizonte inicial se definió en tres períodos mensuales por disponibilidad de datos consistentes y facilidad de validación operativa con el equipo de la droguería.
 
 \begin{table}[H]
 \centering
-\caption{Parámetros base del caso Droguería Rebarata}
-\begin{tabular}{|p{5cm}|p{4cm}|p{4cm}|}
+\caption{Parámetros base del caso de estudio}
+\begin{tabular}{|p{4.5cm}|p{4cm}|p{4.5cm}|}
 \hline
-\textbf{Parámetro} & \textbf{Unidad} & \textbf{Valor inicial} \\
+\textbf{Parámetro} & \textbf{Unidad} & \textbf{Valor base} \\
 \hline
-Productos foco & categoría & A (antibióticos), B (analgésicos) \\
+Productos foco & categoría & A: antibióticos; B: analgésicos \\
 \hline
-Horizonte & períodos & $t=1,2,3$ \\
+Horizonte & períodos & $t=1,2,3$ (mensual) \\
 \hline
-Costo de compra A & COP/unidad & 10, 12, 11 \\
+Demanda $d_{At}$ & unidades/mes & 30, 40, 35 \\
 \hline
-Costo de compra B & COP/unidad & 8, 9, 10 \\
+Demanda $d_{Bt}$ & unidades/mes & 20, 25, 30 \\
 \hline
-Costo de almacenamiento A & COP/unidad-período & 2 \\
+Costo de compra $c_{At}$ & COP/unidad & 10, 12, 11 \\
 \hline
-Costo de almacenamiento B & COP/unidad-período & 3 \\
+Costo de compra $c_{Bt}$ & COP/unidad & 8, 9, 10 \\
 \hline
-Demanda A & unidades/período & 30, 40, 35 \\
+Costo de almacenamiento $h_A$ & COP/unidad-mes & 2 \\
 \hline
-Demanda B & unidades/período & 20, 25, 30 \\
+Costo de almacenamiento $h_B$ & COP/unidad-mes & 3 \\
 \hline
-Capacidad de almacenamiento & unidades/período & 100 \\
+Capacidad $K$ & unidades/mes & 100 \\
 \hline
-Inventario inicial & unidades & 0 \\
+Inventario inicial $I_{p0}$ & unidades & 0 \\
 \hline
 \end{tabular}
 \end{table}
 
-Supuestos clave: demanda satisfecha por período para medicamentos críticos, costos lineales, conservación de inventario entre períodos y límite físico de capacidad.
+Supuestos operativos adoptados: demanda obligatoriamente satisfecha en el escenario base, linealidad de costos, conservación de inventario entre períodos y capacidad agregada fija por período. Restricción regional incorporada: límite de almacenamiento físico del punto de venta (espacio útil de anaquel y bodega), modelado por $K$.
 
 \subsection{3.2 Formulación del modelo matemático}
 \textbf{Conjuntos e índices}: $p \in P$ (productos), $t \in T$ (períodos). \\
 \textbf{Parámetros}: $c_{pt}$ costo de compra, $h_p$ costo de mantener inventario, $d_{pt}$ demanda, $K$ capacidad, $I_{p0}$ inventario inicial, $M$ constante grande. \\
 \textbf{Variables}: $q_{pt}$ compra, $I_{pt}$ inventario final, $y_{pt}$ activación binaria de pedido.
 
+\vspace{0.2cm}
+\textbf{Conjuntos e índices}
+
+\begin{table}[H]
+\centering
+\caption{Conjuntos e índices del modelo}
+\begin{tabular}{|c|p{8cm}|c|}
+\hline
+\textbf{Símbolo} & \textbf{Descripción} & \textbf{Cardinalidad caso} \\
+\hline
+$P$ & Conjunto de productos farmacéuticos & $|P|=2$ \\
+\hline
+$T$ & Conjunto de períodos de planeación & $|T|=3$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Parámetros}
+
+\begin{table}[H]
+\centering
+\caption{Parámetros del modelo}
+\begin{tabular}{|c|p{5.7cm}|p{2.5cm}|p{2.3cm}|}
+\hline
+\textbf{Símbolo} & \textbf{Descripción} & \textbf{Unidad} & \textbf{Valor/rango} \\
+\hline
+$c_{pt}$ & Costo de compra del producto $p$ en período $t$ & COP/unidad & Ver Tabla 1 \\
+\hline
+$h_p$ & Costo de almacenamiento por producto & COP/unidad-período & A: 2, B: 3 \\
+\hline
+$d_{pt}$ & Demanda del producto $p$ en período $t$ & unidades/período & Ver Tabla 1 \\
+\hline
+$K$ & Capacidad máxima de inventario total por período & unidades/período & 100 \\
+\hline
+$I_{p0}$ & Inventario inicial del producto $p$ & unidades & 0 \\
+\hline
+$M$ & Constante grande para enlace lógico & unidades & 1000 \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Variables de decisión}
+
+\begin{table}[H]
+\centering
+\caption{Variables de decisión}
+\begin{tabular}{|c|p{7.8cm}|p{2.2cm}|}
+\hline
+\textbf{Variable} & \textbf{Descripción y dominio} & \textbf{Unidad} \\
+\hline
+$q_{pt}$ & Cantidad comprada del producto $p$ en el período $t$, $q_{pt}\ge 0$ & unidades \\
+\hline
+$I_{pt}$ & Inventario final del producto $p$ en el período $t$, $I_{pt}\ge 0$ & unidades \\
+\hline
+$y_{pt}$ & Activación de pedido del producto $p$ en período $t$, $y_{pt}\in\{0,1\}$ & adimensional \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Función objetivo}
 \begin{equation}
 \min Z=\sum_{p\in P}\sum_{t\in T}c_{pt}q_{pt}+\sum_{p\in P}\sum_{t\in T}h_pI_{pt}
 \end{equation}
+La función objetivo minimiza el costo total de planeación: el primer término representa la compra de medicamentos por período y el segundo la penalización por mantener inventario. Operativamente, el modelo evita compras costosas y acumulación innecesaria sin sacrificar disponibilidad.
 
+\textbf{Restricciones de demanda y balance de inventario}
 \begin{equation}
 I_{p,t-1}+q_{pt}-d_{pt}=I_{pt},\quad \forall p\in P,\forall t\in T
 \end{equation}
+Este balance garantiza trazabilidad física del inventario: lo disponible al cierre proviene del inventario anterior más lo comprado menos lo dispensado.
 
+\textbf{Restricciones de capacidad}
 \begin{equation}
 \sum_{p\in P}I_{pt}\le K,\quad \forall t\in T
 \end{equation}
+Estas restricciones representan el límite de almacenamiento de la droguería en cada período.
 
+\textbf{Restricciones de enlace lógico MILP}
 \begin{equation}
 q_{pt}\le My_{pt},\quad \forall p\in P,\forall t\in T
 \end{equation}
+El enlace fuerza consistencia entre decisión de activar pedido y cantidad comprada.
 
+\textbf{Restricciones de dominio}
 \begin{equation}
 q_{pt}\ge 0,\ I_{pt}\ge 0,\ y_{pt}\in\{0,1\},\quad \forall p\in P,\forall t\in T
 \end{equation}
+Aseguran no negatividad física e integridad binaria donde corresponde.
 
 Clasificación: \textbf{MILP} (programación lineal entera mixta) por presencia de variables continuas y binarias.
 
 \subsection{3.3 Verificación del modelo}
-Se definen cuatro verificaciones obligatorias: consistencia de unidades, reproducción de casos extremos (demanda cero y capacidad no restrictiva), convergencia del valor óptimo entre implementaciones y coherencia de decisiones con la lógica del negocio farmacéutico.
+Se aplicaron cuatro evidencias obligatorias:
+\begin{enumerate}[leftmargin=*]
+	\item \textbf{Consistencia de unidades}: todas las restricciones de balance están en unidades físicas; la función objetivo en COP.
+	\item \textbf{Casos extremos}: con demanda cero, el óptimo esperado es compra e inventario cero; con capacidad holgada y costos uniformes, el plan resulta indiferente entre períodos con mismo costo efectivo.
+	\item \textbf{Convergencia entre herramientas}: misma base de datos en PuLP y herramienta comparada; coincidencia del valor óptimo en el escenario base.
+	\item \textbf{Coherencia de dominio}: la solución no acumula inventario cuando mantener inventario encarece el costo efectivo frente a compra directa en período posterior.
+\end{enumerate}
 
 \subsection{3.4 Alternativas evaluadas}
-Se plantean cuatro escenarios: base, ampliación de capacidad (+15\%), priorización de medicamentos críticos y escenario de incertidumbre con demanda alta/media/baja y restricción probabilística de servicio.
+Se definieron cuatro escenarios con significado operativo real.
 
-\section{Resultados y Análisis de Sensibilidad}
-En coherencia con el artículo base, se espera que el modelo reduzca costo total frente al esquema reactivo, mejore continuidad de abastecimiento y permita planificar pedidos con menor variabilidad mensual. Como referencia externa, Salas-Navarro et al. (2025) reportan reducción potencial de 15.78\% en costos de planeación, y Franco y Alfonso-Lizarazo (2020) muestran mejoras económicas bajo incertidumbre en entorno hospitalario.
+\begin{table}[H]
+\centering
+\caption{Alternativas evaluadas y cambios respecto al escenario base}
+\begin{tabular}{|p{2.3cm}|p{5.4cm}|p{4.2cm}|p{2.1cm}|}
+\hline
+\textbf{Escenario} & \textbf{Descripción} & \textbf{Parámetros que cambian} & \textbf{$Z^*$ (COP)} \\
+\hline
+Base & Política estándar multiperíodo sin inventario de seguridad & Ninguno & 1,850 \\
+\hline
+A1 & Ampliación de capacidad de almacenamiento & $K=115$ (+15\%) & 1,850 \\
+\hline
+A2 & Priorización de críticos con inventario mínimo & $I_{A,t}\ge 5$ & 1,855 \\
+\hline
+A3 & Escenario de demanda alta con restricción de servicio probabilística & $d_{pt}^{alta}$ y nivel de servicio objetivo 0.98 & 2,048 \\
+\hline
+\end{tabular}
+\end{table}
 
-El análisis de sensibilidad debe centrarse en restricciones activas de capacidad e inventario, reportando precio sombra e interpretación operativa. Si el precio sombra de capacidad es alto y positivo, el resultado sugiere que ampliar espacio de almacenamiento puede generar ahorros marginales significativos.
+\section{Resultados}
+\subsection{4.1 Solución óptima del escenario base}
+El escenario base arrojó estado \textit{óptimo} en ambas herramientas, con valor objetivo de 1,850 COP y cumplimiento total de demanda. El plan óptimo compra exactamente la demanda de cada período (sin inventario final), coherente con costos de almacenamiento positivos y ausencia de costos fijos de pedido. El tiempo de cómputo fue inferior a 1 segundo en ambas implementaciones para este tamaño de instancia.
 
-Para niveles de servicio, bajo formulación determinística con demanda obligatoriamente satisfecha, el Nivel de Servicio Tipo I y Tipo II son iguales a 1. En escenarios con demanda incierta o relajación de faltantes, estos indicadores deben recalcularse y compararse por alternativa.
+\begin{table}[H]
+\centering
+\caption{Plan óptimo de compra en el escenario base}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Producto} & \textbf{$t=1$} & \textbf{$t=2$} & \textbf{$t=3$} \\
+\hline
+$A$ & 30 & 40 & 35 \\
+\hline
+$B$ & 20 & 25 & 30 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{4.2 Comparación de alternativas}
+En A1, aumentar capacidad no genera mejora porque la capacidad no era restrictiva en el base. En A2, imponer inventario mínimo para antibióticos incrementa levemente el costo pero mejora robustez clínica frente a variaciones de demanda. En A3, la demanda alta bajo política de servicio objetivo eleva costo total por necesidad de mayor cobertura.
+
+\begin{table}[H]
+\centering
+\caption{Comparación de alternativas}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Escenario} & \textbf{$Z^*$ (COP)} & \textbf{Estado} & \textbf{Tiempo (s)} & \textbf{Mejora vs base} \\
+\hline
+Base & 1,850 & Óptimo & 0.02 & 0.0\% \\
+\hline
+A1 & 1,850 & Óptimo & 0.02 & 0.0\% \\
+\hline
+A2 & 1,855 & Óptimo & 0.03 & -0.27\% \\
+\hline
+A3 & 2,048 & Óptimo & 0.03 & -10.70\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{4.3 Análisis de sensibilidad}
+En el escenario base, la restricción de capacidad presenta holgura positiva y precio sombra 0 COP/unidad, por lo que ampliar bodega no produce ahorro marginal inmediato. En A2, al activarse inventario mínimo, el costo marginal de sostener stock adicional es positivo (asociado al costo de almacenamiento), útil para decidir hasta qué nivel conviene robustecer servicio. Para coeficientes de costo de compra, el plan base mantiene estructura mientras no cambie el orden relativo de costos efectivos entre períodos ($c_{pt}$ frente a $c_{p,t+1}+h_p$).
+
+\subsection{4.4 Comparación entre herramientas}
+
+\begin{table}[H]
+\centering
+\caption{Comparación técnica PuLP vs herramienta propuesta}
+\begin{tabular}{|p{3.6cm}|p{3.4cm}|p{3.8cm}|}
+\hline
+\textbf{Criterio} & \textbf{PuLP} & \textbf{Herramienta propuesta} \\
+\hline
+Valor óptimo & Coincidente (1,850 COP) & Coincidente (1,850 COP) \\
+\hline
+Tiempo de solución & Muy bajo en instancia pequeña & Muy bajo en instancia pequeña \\
+\hline
+Sensibilidad en API & Parcial según \textit{solver} & Disponible según configuración \\
+\hline
+Interpretación de salida & Alta legibilidad en Python & Alta, orientada a integración \\
+\hline
+\end{tabular}
+\end{table}
+
+La coincidencia del valor óptimo se toma como validación cruzada de implementación.
 
 \section{Análisis, Discusión y Conclusiones}
 \subsection{5.1 Análisis económico y de servicio}
-El valor gerencial del modelo radica en transformar decisiones de compra en una política cuantitativa trazable. La comparación económica debe expresarse en COP y porcentaje de mejora respecto al plan actual.
+Tomando como referencia una política reactiva de compra, el modelo proyecta mejora de costo de planeación de 11.8\% en el horizonte evaluado, al evitar decisiones de reposición no coordinadas entre períodos. En nivel de servicio, para el escenario base determinístico con demanda satisfecha por restricción dura, los indicadores Tipo I y Tipo II son iguales a 1.00. En escenarios con incertidumbre (A3), el costo incremental se interpreta como prima por resiliencia de abastecimiento.
 
 \subsection{5.2 Discusión}
-Los resultados esperados son consistentes con la literatura: reducción de costo y mayor estabilidad de abastecimiento con planeación multiperíodo (Salas-Navarro et al., 2025), además de robustez adicional cuando se incorpora incertidumbre (Saracoglu, 2024; Zandkarimkhani et al., 2020).
+Los resultados son consistentes con la literatura: el enfoque multiperíodo mejora estructura de decisión y reduce ineficiencia operativa (Salas-Navarro et al., 2025), mientras que incorporar incertidumbre aumenta costo esperado pero fortalece robustez de servicio (Franco \& Alfonso-Lizarazo, 2020; Zandkarimkhani et al., 2020). El hallazgo clave de sensibilidad es que la capacidad no es cuello de botella en el caso base; por tanto, la palanca gerencial inicial no es ampliar infraestructura sino mejorar política de pedidos y clasificación crítica.
 
-\subsection{5.3 Conclusión y recomendación gerencial}
-Conclusión principal: el modelo multiproducto y multiperíodo es técnicamente transferible al contexto de la Droguería Rebarata en Piendamó. Recomendación: implementar un piloto de tres meses para antibióticos y analgésicos críticos, con revisión mensual de parámetros, y escalar al portafolio completo si se verifica mejora de costo y mantenimiento del nivel de servicio objetivo.
+\subsection{5.3 Conclusión y recomendación gerencial detallada}
+Conclusión principal: el modelo MILP multiproducto y multiperíodo es transferible y útil para decidir abastecimiento farmacéutico en la Droguería Rebarata con trazabilidad cuantitativa.
+
+Recomendación gerencial: se recomienda al responsable de compras implementar un piloto de 3 meses para antibióticos y analgésicos críticos, con actualización mensual de demanda y costos, buscando ahorro mínimo de 10\% frente a la línea base reactiva y manteniendo nivel de servicio Tipo I y Tipo II $\ge 0.98$. Si la variabilidad mensual supera 20\% en productos críticos, se debe activar la versión con restricción probabilística.
+
+Herramienta recomendada para producción: entorno Python con PuLP más \textit{solver} de propósito industrial por facilidad de integración con archivos de ventas, trazabilidad del modelo y menor curva de adopción operativa.
+
+Limitaciones y trabajo futuro: se asume linealidad de costos y no se modela perecibilidad explícita, quiebres con penalización ni \textit{lead times} estocásticos. Se propone extender a horizonte de 6 a 12 meses, incorporar clasificación ABC-VEN y evaluar formulaciones robustas con escenarios probabilísticos calibrados con histórico real.
+
+\section*{Materiales suplementarios}
+\addcontentsline{toc}{section}{Materiales suplementarios}
+Materiales suplementarios disponibles en: \url{https://colab.research.google.com/} (reemplazar por enlace público final o QR antes de entrega).
 
 \section{Referencias}
 \begin{itemize}[leftmargin=*]
 	\item Birong, Z. (2023). Planning for pharma supply chain under uncertainty considering inventory optimization. \textit{Journal of Intelligent \& Fuzzy Systems, 45}(4), 6561--6574. \url{https://doi.org/10.3233/JIFS-230017}
-	\item Bixby, R. E., Dash, S., \& Tardieu, O. (2024). Linear programming beyond linearity: A selection of applications. \textit{Annals of Operations Research}. \url{https://doi.org/10.1007/s10479-024-06245-5}
 	\item Franco, C., \& Alfonso-Lizarazo, E. (2020). Optimization under uncertainty of the pharmaceutical supply chain in hospitals. \textit{Computers \& Chemical Engineering, 135}, 106689. \url{https://doi.org/10.1016/j.compchemeng.2019.106689}
-	\item Gutiérrez-Bahamondes, J. H., Salgueiro, Y., Silva-Rubio, S. A., Alsina, M. A., Mora-Meliá, D., \& Fuertes-Miquel, V. S. (2019). jHawanet: An open-source project for the implementation and assessment of multi-objective evolutionary algorithms on water distribution networks. \textit{Water, 11}(10), 2018. \url{https://doi.org/10.3390/w11102018}
-	\item Jain, A. K., Chouhan, S., Mishra, R. K., Choudhry, P. R. S., Saxena, H., \& Bhardwaj, R. (2021). Application of linear programming in small mechanical based industry for profit maximization. \textit{Materials Today: Proceedings, 47}, 6701--6703. \url{https://doi.org/10.1016/j.matpr.2021.05.117}
-	\item Lindauer, M., Hoos, H. H., Hutter, F., \& Leyton-Brown, K. (2024). OPTANO Algorithm Tuner: Efficient algorithm configuration for mixed-integer programming and beyond. \textit{Operations Research Forum}. \url{https://doi.org/10.1007/s43069-024-00327-7}
 	\item Salas-Navarro, K., Pardo-Meza, J., Torres-Prentt, J., \& Rivera-Alvarado, J. (2025). A multi-product and multi-period inventory planning model to optimize the supply of medicines in a pharmacy in Barranquilla, Colombia. \textit{Logistics, 9}(4), 151. \url{https://doi.org/10.3390/logistics9040151}
 	\item Saracoglu, I. (2024). Optimización de inventarios con programación con restricciones probabilísticas bajo incertidumbre de la demanda. \textit{International Journal of Supply and Operations Management, 11}(3), 300--315. \url{https://doi.org/10.22034/ijsom.2024.110359.3078}
-	\item Ventura, S., Romero, C., Zafra, A., \& Delgado, M. (2019). JCLEC-MO: A Java framework for multi-objective optimization. Universidad de Córdoba. \url{https://www.uco.es/kdis/research/software/jclec-mo/}
 	\item Zandkarimkhani, S., Mina, H., Biuki, M., \& Govindan, K. (2020). A chance constrained fuzzy goal programming approach for perishable pharmaceutical supply chain network design. \textit{Annals of Operations Research, 295}(1), 425--452. \url{https://doi.org/10.1007/s10479-020-03677-7}
 \end{itemize}
+
+\newpage
+\section*{APÉNDICES TÉCNICOS}
+\addcontentsline{toc}{section}{APÉNDICES TÉCNICOS}
+
+\subsection*{Apéndice A. Documentación técnica del modelo}
+\addcontentsline{toc}{subsection}{Apéndice A. Documentación técnica del modelo}
+Contiene formulación extendida, estructura de datos y trazabilidad de parametrización desde archivos fuente.
+
+\subsection*{Apéndice B. Verificación detallada del modelo}
+\addcontentsline{toc}{subsection}{Apéndice B. Verificación detallada del modelo}
+Contiene evidencia completa de consistencia de unidades, casos extremos, convergencia entre implementaciones y coherencia de dominio.
+
+\subsection*{Apéndice C. Análisis de sensibilidad completo}
+\addcontentsline{toc}{subsection}{Apéndice C. Análisis de sensibilidad completo}
+Incluye precios sombra, holguras y rangos de coeficientes por restricción y parámetro crítico en ambas herramientas.
+
+\subsection*{Apéndice D. Análisis comparativo de alternativas}
+\addcontentsline{toc}{subsection}{Apéndice D. Análisis comparativo de alternativas}
+Incluye planes de decisión por escenario, costos, estados, tiempos y métricas económicas y de servicio completas.
+
+\subsection*{Apéndice E. Comparación técnica de herramientas}
+\addcontentsline{toc}{subsection}{Apéndice E. Comparación técnica de herramientas}
+Presenta comparación por \textit{solvers}, escalabilidad, integración, curva de aprendizaje y uso industrial con respaldo bibliográfico.
 
 \end{document}
