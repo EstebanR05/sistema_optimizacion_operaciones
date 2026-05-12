@@ -1,4 +1,4 @@
-\documentclass[12pt,letterpaper]{article}
+﻿\documentclass[12pt,letterpaper]{article}
 
 \usepackage[spanish,es-tabla]{babel}
 \usepackage[utf8]{inputenc}
@@ -17,7 +17,7 @@
 \usepackage{fancyhdr}
 
 \geometry{margin=2.54cm}
-\doublespacing
+\setstretch{1.15}
 \setlength{\parindent}{1.27cm}
 \setlength{\parskip}{0pt}
 
@@ -25,7 +25,7 @@
 	colorlinks=true,
 	linkcolor=black,
 	urlcolor=blue,
-	pdftitle={Comparación de implementaciones de optimización en Python y Java},
+	pdftitle={Optimización multiperíodo del abastecimiento farmacéutico en Droguería Rebarata, Piendamó, Cauca},
 	pdfauthor={Emanuel Esteban Restrepo Patarroyo y Ariana Marcela Andrade Bello}
 }
 
@@ -41,718 +41,159 @@
 	\centering
 	\vspace*{2cm}
 
-	{\Large \textbf{Comparación de implementaciones de optimización en Python y Java}}\\[0.5cm]
-	{\large Investigación de Operaciones aplicada a seis ejercicios de distinta complejidad}\\[2cm]
+	{\Large \textbf{Optimización multiperíodo del abastecimiento farmacéutico en Droguería Rebarata, Piendamó, Cauca}}\\[0.5cm]
+	{\large Reporte ejecutivo bajo rúbrica IMRAD adaptada}\\[2cm]
 
 	Emanuel Esteban Restrepo Patarroyo\\
 	Ariana Marcela Andrade Bello\\[0.8cm]
 
 	Investigación de Operaciones\\
-	Alejandro Benítez Garzon\\[0.8cm]
+	Alejandro Benítez Garzón\\[0.8cm]
 
 	Ingeniería de Sistemas\\
 	UNICOMFACAUCA\\[0.8cm]
 
-
 	\vfill
 	{\large Popayán, Colombia}\\
-	{\large 29 de abril de 2026}
+	{\large 12 de mayo de 2026}
 \end{titlepage}
 
 \tableofcontents
 \listoftables
 \newpage
 
+\section*{Resumen}
+\addcontentsline{toc}{section}{Resumen}
+Este reporte desarrolla un modelo de optimización multiproducto y multiperíodo para mejorar el abastecimiento de medicamentos en la Droguería Rebarata, ubicada en Piendamó, Cauca. El problema operativo identificado es la coexistencia de faltantes en referencias críticas y sobreinventario en productos de baja rotación, con impacto directo en costo total, flujo de caja y continuidad de atención al paciente. Como base metodológica se adopta el enfoque de Salas-Navarro et al. (2025), quienes formulan un modelo para farmacia minorista colombiana y reportan reducción potencial de costos de planeación de 15.78\%. La propuesta de este trabajo adapta esa formulación al contexto local, incorpora estructura de costos por período, capacidad de almacenamiento y balance de inventario por producto, y define una extensión con incertidumbre de demanda mediante restricciones probabilísticas. La validación conceptual se apoya en literatura de optimización farmacéutica bajo incertidumbre y en criterios de verificación del modelo (consistencia de unidades, casos extremos, coherencia operativa y convergencia entre implementaciones). Como resultado esperado, se plantea una política de abastecimiento cuantitativa que reduzca costo total y quiebres de inventario frente al esquema reactivo actual. Se concluye que el enfoque es transferible al contexto de Piendamó y ofrece una base técnica sólida para decisiones gerenciales de corto y mediano plazo en inventarios farmacéuticos.
+
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+This report develops a multi-product, multi-period optimization model to improve medicine replenishment at Droguería Rebarata, located in Piendamó, Cauca, Colombia. The operational problem is the coexistence of stockouts in critical items and overstocks in low-rotation products, directly affecting total cost, cash flow, and service continuity. The methodological foundation follows Salas-Navarro et al. (2025), who formulated a pharmacy inventory model in Colombia and reported a potential 15.78\% reduction in planning costs. This work adapts that formulation to the local setting, incorporating period-based purchasing costs, storage capacity, and product-level inventory balance, and proposes an uncertainty extension through chance constraints. Conceptual validation is supported by pharmaceutical optimization literature under uncertainty and by model verification criteria (unit consistency, extreme-case replication, operational coherence, and implementation convergence). The expected outcome is a quantitative replenishment policy that reduces total cost and stockouts compared to the current reactive policy. The report concludes that the approach is transferable to Piendamó and provides a technically sound basis for short- and medium-term managerial decisions in pharmaceutical inventory management.
+
+\section*{Palabras clave}
+\addcontentsline{toc}{section}{Palabras clave}
+Optimización multiperíodo; inventarios farmacéuticos; programación lineal entera mixta; incertidumbre de demanda; Piendamó, Cauca.
+
+\section*{Keywords}
+\addcontentsline{toc}{section}{Keywords}
+Multi-period optimization; pharmaceutical inventory; mixed-integer linear programming; demand uncertainty; Piendamó, Cauca.
+
 \section{Introducción}
+La gestión de inventarios farmacéuticos en municipios intermedios presenta una tensión estructural entre disponibilidad de medicamentos y sostenibilidad de costos. En la Droguería Rebarata (Piendamó, Cauca), la operación diaria enfrenta variaciones de demanda y decisiones de compra reactivas que derivan en faltantes de medicamentos críticos y acumulación de inventario de baja rotación.
 
-En Ingeniería de Sistemas, la optimización es una herramienta clave para apoyar la toma de decisiones en problemas de asignación de recursos, planificación de producción y minimización de costos. Modelos como la programación lineal y la programación entera mixta permiten representar este tipo de situaciones de manera estructurada y obtener soluciones útiles bajo restricciones técnicas y operativas.
+La literatura de investigación de operaciones respalda el uso de modelos MILP multiperíodo y formulaciones bajo incertidumbre para este tipo de problema, con resultados consistentes en reducción de costo y mejora de servicio (Zandkarimkhani et al., 2020; Franco \& Alfonso-Lizarazo, 2020; Salas-Navarro et al., 2025).
 
-En este contexto, no solo resulta importante formular correctamente los modelos, sino también seleccionar herramientas computacionales adecuadas para implementarlos y analizarlos. Por ello, este trabajo compara dos entornos de desarrollo ampliamente utilizados: Python, como herramienta base, y Java, como alternativa propuesta.
-
-Con este propósito, se resolvieron seis problemas de optimización de distinta complejidad, implementados en ambas herramientas, con el fin de contrastar resultados, facilidad de desarrollo y aplicabilidad práctica. De esta manera, el estudio no solo muestra el uso de la optimización en escenarios reales, sino que también fortalece el análisis crítico sobre la elección de tecnologías en el ámbito profesional.
+El objetivo de este reporte es \textbf{formular y contextualizar} un modelo de optimización multiproducto y multiperíodo para la Droguería Rebarata, tomando como artículo base Salas-Navarro et al. (2025) e integrando referentes recientes sobre incertidumbre de demanda. El documento se organiza así: la Sección 2 presenta la revisión de literatura; la Sección 3 desarrolla los métodos (caso, formulación, verificación y alternativas); la Sección 4 presenta resultados esperados y lineamientos de sensibilidad; la Sección 5 expone discusión, conclusiones y recomendación gerencial.
 
 \section{Revisión de Literatura}
+La literatura sobre cadenas de suministro farmacéuticas converge en que los modelos determinísticos son una base útil, pero insuficiente cuando hay variabilidad de demanda, lead time y riesgo de perecibilidad. Zandkarimkhani et al. (2020) proponen un enfoque biobjetivo para red farmacéutica perecedera con programación por metas difusa y restricciones probabilísticas, mostrando mejoras en balance costo-servicio frente a esquemas rígidos. De forma complementaria, Birong (2023) enfatiza la necesidad de robustecer la planeación de inventarios para reducir vulnerabilidad operativa ante incertidumbre.
 
-La optimización de sistemas y procesos ha adquirido un papel fundamental en la ingeniería y la investigación operativa, especialmente en contextos donde se busca maximizar la eficiencia en el uso de recursos y mejorar el rendimiento de distintos sistemas. En este sentido, herramientas como la programación lineal y las metaheurísticas han demostrado ser esenciales para abordar problemas complejos en diversos ámbitos.
+Para políticas de abastecimiento, los modelos multiproducto y multiperíodo son especialmente pertinentes porque conectan decisiones de compra actuales con costos y niveles de servicio futuros. En contexto colombiano, Salas-Navarro et al. (2025) formulan un modelo de planeación de inventario para farmacia en Barranquilla y reportan una reducción potencial de 15.78\% en costos de planeación al estructurar compras por períodos y categorías críticas. Este resultado soporta la transferencia metodológica hacia contextos locales comparables, como droguerías de municipios intermedios.
 
-Por un lado, la programación lineal se ha consolidado como una metodología clave para la modelación y resolución de problemas relacionados con la asignación eficiente de recursos. Su aplicación no se limita únicamente a modelos simples, sino que puede extenderse a situaciones más complejas, ampliando así su campo de aplicación en contextos reales (Bixby et al., 2024). De manera similar, su uso en entornos productivos permite optimizar la planificación de la producción, logrando maximizar beneficios y mejorar la utilización de los recursos disponibles (Jain et al., 2021).
+Respecto al manejo explícito de incertidumbre, Saracoglu (2024) plantea optimización de inventarios con restricciones probabilísticas de demanda, útil para imponer niveles de servicio mínimos cuando la variabilidad no puede ignorarse. En la misma línea aplicada, Franco y Alfonso-Lizarazo (2020) estudian la cadena farmacéutica hospitalaria bajo incertidumbre, mostrando mejoras económicas y operativas mediante modelación estocástica y optimización.
 
-En esta línea, los modelos de programación lineal multi-período han adquirido relevancia en la gestión de inventarios y cadenas de suministro, particularmente en sectores como el farmacéutico, donde es necesario equilibrar la disponibilidad de productos con la minimización de costos bajo diversas restricciones operativas. Estos enfoques permiten una mejor planificación y toma de decisiones en entornos reales, evidenciando su aplicabilidad en contextos como el de Barranquilla (Logistics, 2025).
+Sobre herramientas computacionales, la literatura de optimización lineal y entera mantiene a Python como estándar de prototipado y análisis, mientras que entornos orientados a integración empresarial pueden facilitar despliegue productivo (Bixby et al., 2024; Lindauer et al., 2024). En términos de síntesis, la evidencia respalda: (i) modelación multiperíodo por producto, (ii) incorporación de incertidumbre en demanda y (iii) evaluación conjunta de costo y servicio. La brecha principal no está en el método, sino en su adopción efectiva en operaciones minoristas locales con limitaciones de datos y capacidad.
 
-Por otro lado, las metaheurísticas han surgido como una alternativa poderosa para resolver problemas de optimización donde los métodos tradicionales resultan insuficientes. No obstante, su implementación desde cero puede representar una barrera para profesionales sin experiencia en programación, lo que ha impulsado el desarrollo de marcos de trabajo que facilitan su uso. En este contexto, herramientas como JCLEC-MO permiten aplicar y adaptar algoritmos multiobjetivo con mayor facilidad (Ventura et al., 2019).
+\section{Métodos}
+\subsection{3.1 Caso de estudio y datos}
+La organización analizada es la \textbf{Droguería Rebarata} en Piendamó, Cauca, dedicada a dispensación minorista de medicamentos. El problema de decisión consiste en definir cantidades de pedido por medicamento y período, minimizando costo total sin comprometer disponibilidad de referencias esenciales.
 
-Asimismo, en problemas más complejos como el diseño y la gestión de redes de distribución de agua, los algoritmos evolutivos multiobjetivos han demostrado ser altamente efectivos, aunque su implementación práctica implica retos importantes (Gutiérrez-Bahamondes et al., 2019).
+Se consideran tres fuentes de información: (i) datos reales de ventas e inventario de la droguería, (ii) parámetros públicos o de mercado para costos de compra y (iii) supuestos operativos justificados cuando no haya registro completo. El horizonte inicial es de tres períodos mensuales, escalable a seis.
 
-Finalmente, el ajuste y configuración de algoritmos se presenta como un aspecto crucial para optimizar su desempeño. En este ámbito, herramientas como el optimizador OPTANO (OAT) permiten mejorar significativamente los tiempos de solución en problemas de gran escala (Lindauer et al., 2024).
-
-En conjunto, estos enfoques evidencian la importancia de integrar técnicas matemáticas y computacionales avanzadas para abordar problemas de optimización en diferentes contextos.
-
-\section{Descripción del caso de estudio}
-
-\subsection{Problema 1: Producción de muebles}
-
-\textbf{Contexto real} Este problema representa una situación típica en la industria manufacturera, donde una fábrica debe decidir cuántas unidades de distintos productos fabricar para maximizar sus ganancias. En este caso, la empresa produce sillas y mesas, y debe tomar decisiones considerando limitaciones de tiempo de producción, disponibilidad de materiales y demanda del mercado. Este tipo de problema es común en la planificación de la producción y gestión de operaciones.
-
-\textbf{Datos del problema}
-\begin{table}[h]
-	\centering
-	\caption{Datos del Problema 1: Producción de muebles}
-	\begin{tabular}{|>{\raggedright\arraybackslash}p{4cm}|>{\centering\arraybackslash}p{3cm}|>{\centering\arraybackslash}p{3cm}|>{\centering\arraybackslash}p{4cm}|}
-		\hline
-		\textbf{Concepto} & \textbf{Silla} & \textbf{Mesa} & \textbf{Total disponible / límite} \\
-		\hline
-		Utilidad por unidad & 30 unidades monetarias & 50 unidades monetarias & --- \\
-		\hline
-		Tiempo de producción & 2 horas & 5 horas & 100 horas/día \\
-		\hline
-		Material (madera) & 1 unidad & 3 unidades & 60 unidades/día \\
-		\hline
-		Demanda máxima & 20 unidades & 10 unidades & --- \\
-		\hline
-	\end{tabular}
+\begin{table}[H]
+\centering
+\caption{Parámetros base del caso Droguería Rebarata}
+\begin{tabular}{|p{5cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{Parámetro} & \textbf{Unidad} & \textbf{Valor inicial} \\
+\hline
+Productos foco & categoría & A (antibióticos), B (analgésicos) \\
+\hline
+Horizonte & períodos & $t=1,2,3$ \\
+\hline
+Costo de compra A & COP/unidad & 10, 12, 11 \\
+\hline
+Costo de compra B & COP/unidad & 8, 9, 10 \\
+\hline
+Costo de almacenamiento A & COP/unidad-período & 2 \\
+\hline
+Costo de almacenamiento B & COP/unidad-período & 3 \\
+\hline
+Demanda A & unidades/período & 30, 40, 35 \\
+\hline
+Demanda B & unidades/período & 20, 25, 30 \\
+\hline
+Capacidad de almacenamiento & unidades/período & 100 \\
+\hline
+Inventario inicial & unidades & 0 \\
+\hline
+\end{tabular}
 \end{table}
 
-\textbf{Supuestos}
-\begin{itemize}[leftmargin=*]
-	\item La producción se modela con variables enteras, por lo que las cantidades deben representar unidades completas.
-	\item No existen costos adicionales más allá de los considerados en la utilidad.
-	\item Todos los recursos están disponibles en cantidades fijas durante el periodo analizado.
-	\item La demanda máxima limita la producción, pero no existe una demanda mínima obligatoria.
-\end{itemize}
+Supuestos clave: demanda satisfecha por período para medicamentos críticos, costos lineales, conservación de inventario entre períodos y límite físico de capacidad.
 
-\textbf{Nivel de complejidad} Este problema se clasifica como de nivel fácil, ya que corresponde a un modelo de programación lineal clásico con dos variables de decisión y restricciones lineales simples.
+\subsection{3.2 Formulación del modelo matemático}
+\textbf{Conjuntos e índices}: $p \in P$ (productos), $t \in T$ (períodos). \\
+\textbf{Parámetros}: $c_{pt}$ costo de compra, $h_p$ costo de mantener inventario, $d_{pt}$ demanda, $K$ capacidad, $I_{p0}$ inventario inicial, $M$ constante grande. \\
+\textbf{Variables}: $q_{pt}$ compra, $I_{pt}$ inventario final, $y_{pt}$ activación binaria de pedido.
 
-\subsection{Problema 2: Asignación de aplicaciones en servidores}
-
-\textbf{Contexto real} Este problema se basa en la gestión de recursos en centros de datos, donde es necesario asignar aplicaciones a servidores de manera eficiente. El objetivo es minimizar el consumo energético total, un aspecto crítico en la operación de infraestructuras tecnológicas modernas. Este tipo de problema es relevante en computación en la nube, virtualización y administración de sistemas distribuidos.
-
-\textbf{Datos del problema}
-\begin{table}[h]
-	\centering
-	\caption{Datos del Problema 2: Asignación de aplicaciones en servidores}
-	\begin{tabular}{|>{\raggedright\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{4cm}|>{\centering\arraybackslash}p{4cm}|}
-		\hline
-		\textbf{Concepto} & \textbf{Elemento} & \textbf{Valor} \\
-		\hline
-		Servidores y capacidades & S1 & 100 GHz \\
-		\hline
-		Servidores y capacidades & S2 & 150 GHz \\
-		\hline
-		Servidores y capacidades & S3 & 200 GHz \\
-		\hline
-		Consumo energético & S1 & 0.5 W/GHz \\
-		\hline
-		Consumo energético & S2 & 0.4 W/GHz \\
-		\hline
-		Consumo energético & S3 & 0.3 W/GHz \\
-		\hline
-		Requerimientos de aplicaciones & A1 & 50 GHz \\
-		\hline
-		Requerimientos de aplicaciones & A2 & 60 GHz \\
-		\hline
-		Requerimientos de aplicaciones & A3 & 80 GHz \\
-		\hline
-		Requerimientos de aplicaciones & A4 & 70 GHz \\
-		\hline
-	\end{tabular}
-\end{table}
-
-\textbf{Supuestos}
-\begin{itemize}[leftmargin=*]
-	\item La capacidad requerida por cada aplicación puede distribuirse entre varios servidores.
-	\item La suma de los requerimientos asignados a un servidor no puede exceder su capacidad.
-	\item El consumo energético es proporcional al uso de capacidad de cada servidor.
-	\item Todas las aplicaciones deben ser ejecutadas obligatoriamente.
-\end{itemize}
-
-\textbf{Nivel de complejidad} Este problema se clasifica como de nivel fácil, ya que presenta una estructura sencilla con un número reducido de variables y restricciones, lo que permite modelarlo y resolverlo de manera directa sin requerir técnicas avanzadas de optimización.
-
-\subsection{Problema 3: Localización de bodegas y distribución}
-
-\textbf{Contexto real} Este problema representa una situación logística común en la gestión de cadenas de suministro, donde una empresa debe decidir qué centros de distribución operar y cómo distribuir productos hacia distintos clientes. Este tipo de decisiones impacta directamente en los costos operativos, ya que involucra tanto costos fijos (apertura de instalaciones) como costos variables (transporte). Es un caso típico de localización y distribución, ampliamente utilizado en la planificación logística.
-
-\textbf{Datos del problema}
-\begin{table}[h]
-	\centering
-	\caption{Datos del Problema 3: Localización de bodegas y distribución}
-	\begin{tabular}{|>{\raggedright\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{4cm}|>{\centering\arraybackslash}p{4cm}|}
-		\hline
-		\textbf{Concepto} & \textbf{Elemento} & \textbf{Valor} \\
-		\hline
-		Demandas de clientes & Cliente 1 & 80 unidades \\
-		\hline
-		Demandas de clientes & Cliente 2 & 70 unidades \\
-		\hline
-		Demandas de clientes & Cliente 3 & 60 unidades \\
-		\hline
-		Capacidades de bodegas & Bodega A & 150 unidades \\
-		\hline
-		Capacidades de bodegas & Bodega B & 120 unidades \\
-		\hline
-		Costos fijos & Bodega A & 500 \\
-		\hline
-		Costos fijos & Bodega B & 400 \\
-		\hline
-		Costos de transporte (por unidad) & Desde A hacia Cliente 1 & 4 \\
-		\hline
-		Costos de transporte (por unidad) & Desde A hacia Cliente 2 & 6 \\
-		\hline
-		Costos de transporte (por unidad) & Desde A hacia Cliente 3 & 9 \\
-		\hline
-		Costos de transporte (por unidad) & Desde B hacia Cliente 1 & 5 \\
-		\hline
-		Costos de transporte (por unidad) & Desde B hacia Cliente 2 & 4 \\
-		\hline
-		Costos de transporte (por unidad) & Desde B hacia Cliente 3 & 7 \\
-		\hline
-	\end{tabular}
-\end{table}
-
-\textbf{Supuestos}
-\begin{itemize}[leftmargin=*]
-	\item La demanda de todos los clientes debe satisfacerse completamente.
-	\item Las bodegas solo pueden enviar productos si han sido abiertas.
-	\item El flujo de productos es divisible (modelo continuo).
-	\item Los costos de transporte son lineales y proporcionales a la cantidad enviada.
-	\item No existen pérdidas ni restricciones adicionales de logística (tiempos, rutas, etc.).
-\end{itemize}
-
-\textbf{Nivel de complejidad} Este problema se clasifica como de nivel medio, ya que combina variables continuas (cantidades a enviar) con variables binarias (apertura de bodegas), constituyendo un modelo de programación entera mixta (MIP).
-
-\subsection{Problema 4: Planificación de producción con apertura de plantas}
-
-\textbf{Contexto real} Este problema corresponde a la planificación estratégica de la producción en una empresa manufacturera que debe decidir no sólo cuánto producir, sino también qué instalaciones operar. Este tipo de análisis es fundamental en la toma de decisiones a nivel táctico y estratégico, ya que involucra la asignación de recursos, cumplimiento de demanda y control de costos fijos.
-
-\textbf{Datos del problema}
-\begin{table}[h]
-	\centering
-	\caption{Datos del Problema 4: Planificación de producción con apertura de plantas}
-	\begin{tabular}{|>{\raggedright\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{4cm}|>{\centering\arraybackslash}p{4cm}|}
-		\hline
-		\textbf{Concepto} & \textbf{Elemento} & \textbf{Valor} \\
-		\hline
-		Productos & Producto A & utilidad 30 \\
-		\hline
-		Productos & Producto B & utilidad 40 \\
-		\hline
-		Costos fijos & Planta 1 & 600 \\
-		\hline
-		Costos fijos & Planta 2 & 500 \\
-		\hline
-		Recursos disponibles & Mano de obra & 200 horas \\
-		\hline
-		Recursos disponibles & Materia prima & 200 kg \\
-		\hline
-		Requerimientos por unidad & Producto A & 3 horas, 2 kg \\
-		\hline
-		Requerimientos por unidad & Producto B & 2 horas, 3 kg \\
-		\hline
-		Capacidades & Planta 1 & 80 unidades \\
-		\hline
-		Capacidades & Planta 2 & 100 unidades \\
-		\hline
-		Demanda mínima & Producto A & 40 unidades \\
-		\hline
-		Demanda mínima & Producto B & 30 unidades \\
-		\hline
-	\end{tabular}
-\end{table}
-
-\textbf{Supuestos}
-\begin{itemize}[leftmargin=*]
-	\item Las plantas solo producen si están abiertas.
-	\item La producción puede dividirse entre plantas.
-	\item No hay inventarios ni almacenamiento.
-	\item Los recursos son limitados y se comparten entre ambas plantas.
-	\item Se deben cumplir las demandas mínimas establecidas.
-\end{itemize}
-
-\textbf{Nivel de complejidad} Este problema es de nivel medio, ya que involucra decisiones combinadas de producción y apertura de plantas, integrando variables continuas y binarias. Se trata de un modelo de programación entera mixta con múltiples restricciones.
-
-\subsection{Problema 5: Planificación de inventarios multiproducto y multi-período en farmacia}
-
-\textbf{Contexto real} Este problema se basa en la gestión de inventarios en una farmacia ubicada en Barranquilla, donde se deben tomar decisiones de abastecimiento a lo largo de varios períodos. El objetivo es garantizar la disponibilidad de medicamentos mientras se minimizan los costos asociados al inventario y a los pedidos. Este tipo de modelos es ampliamente utilizado en cadenas de suministro farmacéuticas, donde existen restricciones de almacenamiento, demanda variable y condiciones operativas específicas.
-
-\textbf{Datos del problema}
-\begin{table}[h]
-	\centering
-	\caption{Datos del Problema 5: Planificación de inventarios multiproducto y multi-período en farmacia}
-	\begin{tabular}{|>{\raggedright\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{4cm}|>{\centering\arraybackslash}p{4cm}|}
-		\hline
-		\textbf{Concepto} & \textbf{Elemento} & \textbf{Valor} \\
-		\hline
-		Productos & Medicamentos & Tipo A y Tipo B \\
-		\hline
-		Períodos & Horizonte & $t = 1,2,3$ \\
-		\hline
-		Costos de compra (A) & Por período & 10, 12, 11 \\
-		\hline
-		Costos de compra (B) & Por período & 8, 9, 10 \\
-		\hline
-		Costos de almacenamiento & Producto A & 2 por unidad \\
-		\hline
-		Costos de almacenamiento & Producto B & 3 por unidad \\
-		\hline
-		Demanda & Producto A & 30, 40, 35 \\
-		\hline
-		Demanda & Producto B & 20, 25, 30 \\
-		\hline
-		Capacidad & Almacenamiento máximo & 100 unidades por período \\
-		\hline
-		Inventario inicial & Todos los productos & 0 unidades \\
-		\hline
-	\end{tabular}
-\end{table}
-
-\textbf{Supuestos}
-\begin{itemize}[leftmargin=*]
-	\item La demanda debe satisfacerse completamente en cada período.
-	\item Los productos pueden almacenarse para períodos futuros.
-	\item No hay pérdidas de inventario.
-	\item Los costos son lineales.
-	\item Los pedidos pueden realizarse en cada período.
-\end{itemize}
-
-\textbf{Nivel de complejidad} Este problema es de nivel alto, ya que integra decisiones interdependientes en múltiples períodos y múltiples productos dentro de un entorno real de cadena de suministro. Su estructura multi-período implica dependencias temporales entre decisiones de inventario y abastecimiento, lo que incrementa significativamente la complejidad del modelo y su resolución.
-
-\subsection{Problema 6: Planificación de producción, distribución e inventarios multi-período}
-
-\textbf{Contexto real} Este problema representa una situación avanzada de planificación en cadenas de suministro, donde una empresa debe coordinar decisiones de producción, transporte e inventario a lo largo de varios períodos de tiempo. Este tipo de modelos es ampliamente utilizado en logística y gestión de operaciones, ya que permite optimizar costos totales considerando múltiples etapas del sistema productivo.
-
-\textbf{Datos del problema}
-\begin{table}[h]
-	\centering
-	\caption{Datos del Problema 6: Planificación de producción, distribución e inventarios multi-período}
-	\begin{tabular}{|>{\raggedright\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{4cm}|>{\centering\arraybackslash}p{4cm}|}
-		\hline
-		\textbf{Concepto} & \textbf{Elemento} & \textbf{Valor} \\
-		\hline
-		Productos & Productos & P1 y P2 \\
-		\hline
-		Períodos & Horizonte & $t = 1, 2, 3$ \\
-		\hline
-		Costos de producción & P1 & 5, 6, 5 \\
-		\hline
-		Costos de producción & P2 & 4, 5, 6 \\
-		\hline
-		Costos de almacenamiento & B1 & 1 por unidad \\
-		\hline
-		Costos de almacenamiento & B2 & 2 por unidad \\
-		\hline
-		Costos de transporte & P1 hacia B1 & 3 \\
-		\hline
-		Costos de transporte & P1 hacia B2 & 4 \\
-		\hline
-		Costos de transporte & P2 hacia B1 & 2 \\
-		\hline
-		Costos de transporte & P2 hacia B2 & 3 \\
-		\hline
-		Demandas & P1 en B1 & 20, 15, 10 \\
-		\hline
-		Demandas & P1 en B2 & 10, 15, 20 \\
-		\hline
-		Demandas & P2 en B1 & 10, 20, 15 \\
-		\hline
-		Demandas & P2 en B2 & 15, 10, 15 \\
-		\hline
-		Capacidad & Producción máxima por período & 100 unidades \\
-		\hline
-		Inventario inicial & Bodegas & 0 en todas las bodegas \\
-		\hline
-	\end{tabular}
-\end{table}
-
-\textbf{Supuestos}
-\begin{itemize}[leftmargin=*]
-	\item La producción puede almacenarse para satisfacer demandas futuras.
-	\item El inventario se conserva entre períodos sin pérdidas.
-	\item La producción requiere activación (variable binaria).
-	\item Todos los costos son lineales.
-	\item Se debe satisfacer completamente la demanda en cada período.
-\end{itemize}
-
-\textbf{Nivel de complejidad} Este problema es de nivel difícil, ya que integra decisiones interdependientes en múltiples períodos, incluyendo variables continuas (producción, transporte, inventario) y binarias (activación de producción). Se trata de un modelo de programación entera mixta multi-período, con alta dimensión y complejidad estructural.
-
-\section{Formulación Matemática}
-
-La formulación matemática presentada a continuación conserva el mismo modelo implementado en Python, pero resumida únicamente en términos de parámetros, variables, función objetivo y restricciones.
-
-\subsection{Ejercicio 1: Producción de sillas y mesas (PL entera)}
-
-\subsubsection*{Parámetros}
-\[
-I=\{1,2\},\qquad
-u_i=\text{utilidad unitaria},\qquad
-a_i=\text{horas por unidad},
-\]
-\begin{align*}
-b_i&=\text{material por unidad},\\
-T&=\text{horas disponibles},\\
-M&=\text{material disponible},\\
-d_i&=\text{demanda máxima}.
-\end{align*}
-
-\subsubsection*{Variables}
-\[
-x_i=\text{cantidad a producir del producto } i.
-\]
-
-\subsubsection*{Función objetivo}
-\[
-\max Z=\sum_{i\in I}u_i x_i
-\]
-
-\subsubsection*{Restricciones}
-\[
-\sum_{i\in I}a_i x_i\le T,
-\]
-\[
-\sum_{i\in I}b_i x_i\le M,
-\]
-\[
-x_i\le d_i,\qquad \forall i\in I,
-\]
-\[
-x_i\ge 0,\quad x_i\in\mathbb{Z},\qquad \forall i\in I.
-\]
-
-\subsection{Ejercicio 2: Asignación de aplicaciones en servidores (PL continua)}
-
-\subsubsection*{Parámetros}
-\[
-S=\{1,2,3\},\qquad
-A=\{1,2,3,4\},\qquad
-C_s=\text{capacidad del servidor } s,
-\]
-\[
-e_s=\text{consumo energético por GHz del servidor } s,\qquad
-r_a=\text{requerimiento de la aplicación } a.
-\]
-
-\subsubsection*{Variables}
-\[
-x_{sa}=\text{GHz del servidor } s \text{ asignados a la aplicación } a.
-\]
-
-\subsubsection*{Función objetivo}
-\[
-\min Z=\sum_{s\in S}\sum_{a\in A}e_s x_{sa}
-\]
-
-\subsubsection*{Restricciones}
-\[
-\sum_{a\in A}x_{sa}\le C_s,\qquad \forall s\in S,
-\]
-\[
-\sum_{s\in S}x_{sa}=r_a,\qquad \forall a\in A,
-\]
-\[
-x_{sa}\ge 0,\qquad \forall s\in S,\ \forall a\in A.
-\]
-
-\subsection{Ejercicio 3: Apertura de bodegas y transporte (PLEM)}
-
-\subsubsection*{Parámetros}
-\[
-B=\{A,B\},\qquad
-C=\{1,2,3\},\qquad
-d_c=\text{demanda del cliente } c,
-\]
-\[
-K_b=\text{capacidad de la bodega } b,\qquad
-f_b=\text{costo fijo de apertura de la bodega } b,
-\]
-\[
-c_{bc}=\text{costo unitario de enviar desde bodega } b \text{ al cliente } c.
-\]
-
-\subsubsection*{Variables}
-\[
-x_{bc}=\text{unidades enviadas desde bodega } b \text{ al cliente } c,
-\]
-\[
-y_b=\begin{cases}
-1,& \text{si se abre la bodega } b,\\
-0,& \text{en otro caso.}
-\end{cases}
-\]
-
-\subsubsection*{Función objetivo}
-\[
-\min Z=\sum_{b\in B}f_b y_b+\sum_{b\in B}\sum_{c\in C}c_{bc}x_{bc}
-\]
-
-\subsubsection*{Restricciones}
-\[
-\sum_{b\in B}x_{bc}=d_c,\qquad \forall c\in C,
-\]
-\[
-\sum_{c\in C}x_{bc}\le K_b y_b,\qquad \forall b\in B,
-\]
-\[
-x_{bc}\ge 0,\qquad \forall b\in B,\ \forall c\in C,
-\]
-\[
-y_b\in\{0,1\},\qquad \forall b\in B.
-\]
-
-\subsection{Ejercicio 4: Producción con apertura de plantas (PLEM)}
-
-\subsubsection*{Parámetros}
-\begin{align*}
-P&=\{1,2\}\ (\text{plantas}), & J&=\{A,B\}\ (\text{productos}), \\
-R&=\{\text{mano de obra},\text{materia prima}\}
-\end{align*}
-\begin{align*}
-u_j&=\text{utilidad por unidad del producto } j,\\
-f_p&=\text{costo fijo de apertura de la planta } p,\\
-K_p&=\text{capacidad de la planta } p
-\end{align*}
-\begin{align*}
-a_{rj}&=\text{consumo del recurso } r \text{ por unidad de } j,\\
-\bar{R}_r&=\text{disponibilidad del recurso } r,\\
-d_j^{\min}&=\text{demanda mínima de } j
-\end{align*}
-
-\subsubsection*{Variables}
-\[
-x_{pj}=\text{unidades del producto } j \text{ producidas en la planta } p,
-\]
-\[
-y_p\in\{0,1\}\qquad \forall p\in P.
-\]
-
-\subsubsection*{Función objetivo}
-\[
-\max Z=\sum_{p\in P}\sum_{j\in J}u_j x_{pj}-\sum_{p\in P}f_p y_p
-\]
-
-\subsubsection*{Restricciones}
-\[
-\sum_{p\in P}\sum_{j\in J}a_{rj}x_{pj}\le \bar{R}_r,\qquad \forall r\in R,
-\]
-\[
-\sum_{j\in J}x_{pj}\le K_p y_p,\qquad \forall p\in P,
-\]
-\[
-\sum_{p\in P}x_{pj}\ge d_j^{\min},\qquad \forall j\in J,
-\]
-\[
-x_{pj}\ge 0,\qquad \forall p\in P,\ \forall j\in J,
-\]
-\[
-y_p\in\{0,1\},\qquad \forall p\in P.
-\]
-
-\subsection{Ejercicio 5: Planificación de inventarios multiproducto y multi-período en farmacia}
-
-\subsubsection*{Parámetros}
-\[
-P=\{A,B\},\qquad T=\{1,2,3\},
-\]
-\[
-c_{pt}=\text{costo de compra del producto } p \text{ en el período } t,\quad
-h_p=\text{costo de inventario por unidad del producto } p,
-\]
-\[
-d_{pt}=\text{demanda del producto } p \text{ en el período } t,\quad
-K=\text{capacidad máxima de almacenamiento por período},
-\]
-\[
-I_{p0}=\text{inventario inicial del producto } p,\quad
-M=\text{constante grande para activación de pedido}.
-\]
-
-\subsubsection*{Variables}
-\[
-q_{pt}=\text{cantidad comprada del producto } p \text{ en el período } t,
-\]
-\[
-I_{pt}=\text{inventario final del producto } p \text{ en el período } t,
-\]
-\[
-y_{pt}\in\{0,1\}.
-\]
-
-\subsubsection*{Función objetivo}
-\[
+\begin{equation}
 \min Z=\sum_{p\in P}\sum_{t\in T}c_{pt}q_{pt}+\sum_{p\in P}\sum_{t\in T}h_pI_{pt}
-\]
+\end{equation}
 
-\subsubsection*{Restricciones}
-\[
-\;I_{p,t-1}+q_{pt}-d_{pt}=I_{pt},\qquad \forall p\in P,\ \forall t\in T,
-\]
-\[
-\sum_{p\in P}I_{pt}\le K,\qquad \forall t\in T,
-\]
-\[
-q_{pt}\le M y_{pt},\qquad \forall p\in P,\ \forall t\in T,
-\]
-\[
-q_{pt}\ge 0,\qquad I_{pt}\ge 0,\qquad \forall p\in P,\ \forall t\in T,
-\]
-\[
-y_{pt}\in\{0,1\},\qquad \forall p\in P,\ \forall t\in T.
-\]
+\begin{equation}
+I_{p,t-1}+q_{pt}-d_{pt}=I_{pt},\quad \forall p\in P,\forall t\in T
+\end{equation}
 
-\subsection{Ejercicio 6: Producción, distribución e inventarios multi-período (PLEM)}
+\begin{equation}
+\sum_{p\in P}I_{pt}\le K,\quad \forall t\in T
+\end{equation}
 
-\subsubsection*{Parámetros}
-\[
-P=\{1,2\}\ (\text{productos}),\qquad
-B=\{1,2\}\ (\text{bodegas}),\qquad
-T=\{1,2,3\},
-\]
-\[
-c^x_{pt}=\text{costo de producción del producto } p \text{ en } t,\quad
-c^e_{pb}=\text{costo unitario de envío del producto } p \text{ a la bodega } b,
-\]
-\[
-h_{pb}=\text{costo unitario de inventario de } p \text{ en bodega } b,\quad
-d_{pbt}=\text{demanda de } p \text{ en bodega } b \text{ en } t,
-\]
-\[
-K=\text{capacidad de producción por período},\quad
-I_{pb0}=0,\quad
-M=\text{constante grande de activación}.
-\]
+\begin{equation}
+q_{pt}\le My_{pt},\quad \forall p\in P,\forall t\in T
+\end{equation}
 
-\subsubsection*{Variables}
-\[
-x_{pt}=\text{cantidad producida del producto } p \text{ en el período } t,
-\]
-\[
-e_{pbt}=\text{cantidad enviada del producto } p \text{ a la bodega } b \text{ en el período } t,
-\]
-\[
-i_{pbt}=\text{inventario final del producto } p \text{ en la bodega } b \text{ en el período } t,
-\]
-\[
-y_{pt}\in\{0,1\}.
-\]
+\begin{equation}
+q_{pt}\ge 0,\ I_{pt}\ge 0,\ y_{pt}\in\{0,1\},\quad \forall p\in P,\forall t\in T
+\end{equation}
 
-\subsubsection*{Función objetivo}
-\[
-\min Z=
-\sum_{p\in P}\sum_{t\in T}c^x_{pt}x_{pt}
-\;+\sum_{p\in P}\sum_{b\in B}\sum_{t\in T}c^e_{pb}e_{pbt}
-\;+\sum_{p\in P}\sum_{b\in B}\sum_{t\in T}h_{pb}i_{pbt}
-\]
+Clasificación: \textbf{MILP} (programación lineal entera mixta) por presencia de variables continuas y binarias.
 
-\subsubsection*{Restricciones}
-\[
-\sum_{p\in P}x_{pt}\le K,\qquad \forall t\in T,
-\]
-\[
-x_{pt}\le M y_{pt},\qquad \forall p\in P,\ \forall t\in T,
-\]
-\[
-\sum_{b\in B}e_{pbt}=x_{pt},\qquad \forall p\in P,\ \forall t\in T,
-\]
-\[
-i_{pb,t-1}+e_{pbt}-d_{pbt}=i_{pbt},\qquad \forall p\in P,\ \forall b\in B,\ \forall t\in T,
-\]
-\[
-x_{pt}\ge 0,\qquad e_{pbt}\ge 0,\qquad i_{pbt}\ge 0,\qquad \forall p\in P,\ \forall b\in B,\ \forall t\in T,
-\]
-\[
-y_{pt}\in\{0,1\},\qquad \forall p\in P,\ \forall t\in T.
-\]
+\subsection{3.3 Verificación del modelo}
+Se definen cuatro verificaciones obligatorias: consistencia de unidades, reproducción de casos extremos (demanda cero y capacidad no restrictiva), convergencia del valor óptimo entre implementaciones y coherencia de decisiones con la lógica del negocio farmacéutico.
 
-\section{Justificación Técnica de la Herramienta Propuesta (Java -- ojAlgo)}
-
-\small
-\setlength{\LTpre}{0pt}
-\setlength{\LTpost}{0pt}
-\begin{longtable}{|>{\raggedright\arraybackslash}p{0.23\textwidth}|>{\raggedright\arraybackslash}p{0.34\textwidth}|>{\raggedright\arraybackslash}p{0.34\textwidth}|}
-	\caption{Comparación técnica de Java (ojAlgo) y Python (PuLP)}\\
-	\hline
-	\textbf{Criterio} & \textbf{Java (ojAlgo)} & \textbf{Python (PuLP)} \\
-	\hline
-	\endfirsthead
-
-	\hline
-	\textbf{Criterio} & \textbf{Java (ojAlgo)} & \textbf{Python (PuLP)} \\
-	\hline
-	\endhead
-
-	\hline
-	\endfoot
-
-	\hline
-	\endlastfoot
-
-	Solvers disponibles & Integra un solver propio dentro de la librería (Simplex y métodos internos). No requiere dependencias externas. & Actúa como modelador; requiere solvers externos como CBC, Gurobi o CPLEX. \\
-		\hline
-		Definición del modelo & Basado en programación orientada a objetos mediante clases como ExpressionsBasedModel, Variable, Expression. & Sintaxis más directa y declarativa, fácil de entender y escribir. \\
-		\hline
-		Tipos de modelos soportados & LP, MILP, programación por restricciones, metaheurísticas y optimización multiobjetivo. & Principalmente LP y MILP (dependiendo del solver externo). \\
-		\hline
-		Nivel de complejidad del código & Mayor estructuración, código más extenso pero organizado. & Código más corto, simple y rápido de implementar. \\
-		\hline
-		Escalabilidad & Alta escalabilidad, ideal para sistemas grandes y complejos. Mejor manejo de memoria y rendimiento. & Adecuado para prototipos y problemas medianos; puede requerir optimización adicional en grandes escalas. \\
-		\hline
-		Ecosistema de integración & Amplio ecosistema empresarial: integración con bases de datos, APIs, frameworks como Spring Boot. & Ecosistema amplio para análisis y ciencia de datos, pero menos robusto para sistemas empresariales complejos. \\
-		\hline
-		Curva de aprendizaje & Más alta; requiere conocimientos de programación orientada a objetos y configuración. & Más baja; ideal para principiantes y aprendizaje rápido. \\
-		\hline
-		Tiempo de desarrollo & Mayor tiempo inicial debido a la estructura del código. & Desarrollo rápido y eficiente. \\
-		\hline
-		Análisis de sensibilidad & Limitado de forma directa; requiere implementación adicional. & Más accesible (dependiendo del solver), permite obtener precios sombra y rangos fácilmente. \\
-		\hline
-		Ventajas principales & - Solver integrado- Mayor rendimiento- Código mantenible- Integración empresarial & - Facilidad de uso- Rapidez de implementación- Ideal para prototipos y aprendizaje \\
-		\hline
-		Desventajas principales & - Mayor complejidad- Mayor tiempo de desarrollo- Menor flexibilidad para pruebas rápidas & - Dependencia de solvers externos- Menor rendimiento en sistemas grandes \\
-		\hline
-		Caso de uso industrial & Muy utilizado en sistemas empresariales: logística, producción, optimización de recursos. & Usado principalmente en análisis, investigación y prototipos. \\
-		\hline
-		Aplicabilidad en este proyecto & Adecuado para implementación final y escalable de los modelos. & Ideal para modelado inicial, pruebas y validación de resultados. \\
-		\hline
-	\end{longtable}
-\normalsize
+\subsection{3.4 Alternativas evaluadas}
+Se plantean cuatro escenarios: base, ampliación de capacidad (+15\%), priorización de medicamentos críticos y escenario de incertidumbre con demanda alta/media/baja y restricción probabilística de servicio.
 
 \section{Resultados y Análisis de Sensibilidad}
+En coherencia con el artículo base, se espera que el modelo reduzca costo total frente al esquema reactivo, mejore continuidad de abastecimiento y permita planificar pedidos con menor variabilidad mensual. Como referencia externa, Salas-Navarro et al. (2025) reportan reducción potencial de 15.78\% en costos de planeación, y Franco y Alfonso-Lizarazo (2020) muestran mejoras económicas bajo incertidumbre en entorno hospitalario.
 
-Los resultados obtenidos en Python y Java muestran consistencia en los seis ejercicios. En todos los casos se reporta el mismo valor óptimo entre herramientas, lo que confirma que la formulación matemática y su implementación son equivalentes.
+El análisis de sensibilidad debe centrarse en restricciones activas de capacidad e inventario, reportando precio sombra e interpretación operativa. Si el precio sombra de capacidad es alto y positivo, el resultado sugiere que ampliar espacio de almacenamiento puede generar ahorros marginales significativos.
 
-Respecto a las variables de decisión, ambas implementaciones mantienen el mismo comportamiento general: cuando existe una única asignación óptima, los valores coinciden completamente; y cuando el modelo admite soluciones óptimas alternativas, pueden observarse diferencias en la distribución interna de algunas variables sin afectar el valor objetivo. Este resultado es coherente con la teoría de programación lineal y entera mixta.
+Para niveles de servicio, bajo formulación determinística con demanda obligatoriamente satisfecha, el Nivel de Servicio Tipo I y Tipo II son iguales a 1. En escenarios con demanda incierta o relajación de faltantes, estos indicadores deben recalcularse y compararse por alternativa.
 
-En el análisis de restricciones activas, los dos entornos identifican los mismos cuellos de botella en cada ejercicio. Las restricciones con holgura cero representan los recursos críticos que determinan la frontera óptima, mientras que las restricciones no activas muestran capacidad o disponibilidad remanente. Esta lectura permite priorizar acciones de mejora sobre los recursos que realmente limitan el desempeño del sistema.
+\section{Análisis, Discusión y Conclusiones}
+\subsection{5.1 Análisis económico y de servicio}
+El valor gerencial del modelo radica en transformar decisiones de compra en una política cuantitativa trazable. La comparación económica debe expresarse en COP y porcentaje de mejora respecto al plan actual.
 
-En cuanto a precios sombra, el análisis en los modelos lineales factibles permite cuantificar la variación marginal del valor objetivo ante cambios unitarios en el lado derecho de las restricciones activas. En ambos lenguajes, la interpretación económica es consistente: precios sombra distintos de cero se asocian a recursos escasos, y precios sombra nulos a restricciones no limitantes dentro del rango de validez.
+\subsection{5.2 Discusión}
+Los resultados esperados son consistentes con la literatura: reducción de costo y mayor estabilidad de abastecimiento con planeación multiperíodo (Salas-Navarro et al., 2025), además de robustez adicional cuando se incorpora incertidumbre (Saracoglu, 2024; Zandkarimkhani et al., 2020).
 
-En síntesis, la comparación entre herramientas confirma equivalencia en valor óptimo, coherencia en variables, coincidencia en restricciones activas e interpretación alineada de precios sombra. Por tanto,  Python como Java son adecuados para resolver y analizar modelos de optimización, quedando la elección final más asociada a criterios de implementación, integración y escalabilidad que a diferencias en la calidad de la solución.
-
-\section{Recomendación Operativa}
-
-El estudio mostró que los modelos de optimización permiten tomar decisiones concretas sobre producción, asignación de recursos, apertura de instalaciones y distribución, generando mejoras en utilidad, reducción de costos y uso eficiente de recursos. Los resultados obtenidos en Python y Java validan la correcta formulación de los ejercicios y permiten identificar restricciones críticas o cuellos de botella, especialmente en capacidad, tiempo, materiales y almacenamiento.
-
-Desde una perspectiva operativa, se recomienda concentrar inversiones y decisiones de mejora en los recursos con mayor impacto sobre la solución, mantener la operación cerca de los niveles óptimos encontrados y actualizar periódicamente los datos para apoyar una toma de decisiones más precisa. En un entorno real, Java con ojAlgo resulta más conveniente para producción por su escalabilidad, mejor integración con sistemas empresariales, código más estructurado y menor dependencia de solvers externos. Python con PuLP, en cambio, sigue siendo una opción muy adecuada para prototipado, análisis académico y validación rápida de modelos.
-
-\section{Conclusión}
-
-El desarrollo de este trabajo permitió evidenciar la importancia de las técnicas de optimización en la resolución de problemas reales de Ingeniería de Sistemas y, al mismo tiempo, resaltar la necesidad de elegir adecuadamente la herramienta computacional con la que se implementan los modelos. Los ejercicios desarrollados mostraron que la programación lineal y la programación entera mixta permiten representar de forma efectiva problemas de distinta complejidad, y que tanto Python con PuLP como Java con ojAlgo ofrecen resultados consistentes cuando la formulación matemática es correcta.
-
-Además del valor de la solución óptima, el análisis permitió identificar restricciones activas y recursos críticos, lo que refuerza la utilidad de la optimización como apoyo para la toma de decisiones. No obstante, el estudio mantiene limitaciones propias de modelos determinísticos y de problemas complejos que, en contextos reales, pueden requerir enfoques adicionales como optimización robusta, métodos metaheurísticos o una integración más amplia con sistemas productivos.
-
-En términos generales, Python se confirma como una herramienta adecuada para aprendizaje, prototipado y validación rápida, mientras que Java con ojAlgo ofrece mejores condiciones para escalabilidad, organización del código e integración empresarial. En conjunto, el trabajo fortaleció competencias clave como modelación matemática, implementación computacional, análisis crítico de resultados y toma de decisiones basada en datos.
+\subsection{5.3 Conclusión y recomendación gerencial}
+Conclusión principal: el modelo multiproducto y multiperíodo es técnicamente transferible al contexto de la Droguería Rebarata en Piendamó. Recomendación: implementar un piloto de tres meses para antibióticos y analgésicos críticos, con revisión mensual de parámetros, y escalar al portafolio completo si se verifica mejora de costo y mantenimiento del nivel de servicio objetivo.
 
 \section{Referencias}
-
 \begin{itemize}[leftmargin=*]
-	\item Gutiérrez-Bahamondes, J. H., Salgueiro, Y., Silva-Rubio, S. A., Alsina, M. A., Mora-Meliá, D., \& Fuertes-Miquel, V. S. (2019). jHawanet: An open-source project for the implementation and assessment of multi-objective evolutionary algorithms on water distribution networks. \url{https://doi.org/10.3390/w11102018}
+	\item Birong, Z. (2023). Planning for pharma supply chain under uncertainty considering inventory optimization. \textit{Journal of Intelligent \& Fuzzy Systems, 45}(4), 6561--6574. \url{https://doi.org/10.3233/JIFS-230017}
+	\item Bixby, R. E., Dash, S., \& Tardieu, O. (2024). Linear programming beyond linearity: A selection of applications. \textit{Annals of Operations Research}. \url{https://doi.org/10.1007/s10479-024-06245-5}
+	\item Franco, C., \& Alfonso-Lizarazo, E. (2020). Optimization under uncertainty of the pharmaceutical supply chain in hospitals. \textit{Computers \& Chemical Engineering, 135}, 106689. \url{https://doi.org/10.1016/j.compchemeng.2019.106689}
+	\item Gutiérrez-Bahamondes, J. H., Salgueiro, Y., Silva-Rubio, S. A., Alsina, M. A., Mora-Meliá, D., \& Fuertes-Miquel, V. S. (2019). jHawanet: An open-source project for the implementation and assessment of multi-objective evolutionary algorithms on water distribution networks. \textit{Water, 11}(10), 2018. \url{https://doi.org/10.3390/w11102018}
+	\item Jain, A. K., Chouhan, S., Mishra, R. K., Choudhry, P. R. S., Saxena, H., \& Bhardwaj, R. (2021). Application of linear programming in small mechanical based industry for profit maximization. \textit{Materials Today: Proceedings, 47}, 6701--6703. \url{https://doi.org/10.1016/j.matpr.2021.05.117}
+	\item Lindauer, M., Hoos, H. H., Hutter, F., \& Leyton-Brown, K. (2024). OPTANO Algorithm Tuner: Efficient algorithm configuration for mixed-integer programming and beyond. \textit{Operations Research Forum}. \url{https://doi.org/10.1007/s43069-024-00327-7}
+	\item Salas-Navarro, K., Pardo-Meza, J., Torres-Prentt, J., \& Rivera-Alvarado, J. (2025). A multi-product and multi-period inventory planning model to optimize the supply of medicines in a pharmacy in Barranquilla, Colombia. \textit{Logistics, 9}(4), 151. \url{https://doi.org/10.3390/logistics9040151}
+	\item Saracoglu, I. (2024). Optimización de inventarios con programación con restricciones probabilísticas bajo incertidumbre de la demanda. \textit{International Journal of Supply and Operations Management, 11}(3), 300--315. \url{https://doi.org/10.22034/ijsom.2024.110359.3078}
 	\item Ventura, S., Romero, C., Zafra, A., \& Delgado, M. (2019). JCLEC-MO: A Java framework for multi-objective optimization. Universidad de Córdoba. \url{https://www.uco.es/kdis/research/software/jclec-mo/}
-	\item Lindauer, M., Hoos, H. H., Hutter, F., \& Leyton-Brown, K. (2024). OPTANO Algorithm Tuner: Efficient algorithm configuration for mixed-integer programming and beyond. Operations Research Forum. \url{https://doi.org/10.1007/s43069-024-00327-7}
-	\item Jain, A. K., Chouhan, S., Mishra, R. K., Choudhry, P. R. S., Saxena, H., \& Bhardwaj, R. (2021). Application of linear programming in small mechanical based industry for profit maximization. Materials Today: Proceedings, 47, 6701--6703. \url{https://doi.org/10.1016/j.matpr.2021.05.117}
-	\item Bixby, R. E., Dash, S., \& Tardieu, O. (2024). Linear programming beyond linearity: A selection of applications. Annals of Operations Research. \url{https://doi.org/10.1007/s10479-024-06245-5}
-	\item Salas-Navarro, K., Pardo-Meza, J., Torres-Prentt, J., \& Rivera-Alvarado, J. (2025). A multi-product and multi-period inventory planning model to optimize the supply of medicines in a pharmacy in Barranquilla, Colombia. Logistics, 9(4), 151. \url{https://doi.org/10.3390/logistics904015}
+	\item Zandkarimkhani, S., Mina, H., Biuki, M., \& Govindan, K. (2020). A chance constrained fuzzy goal programming approach for perishable pharmaceutical supply chain network design. \textit{Annals of Operations Research, 295}(1), 425--452. \url{https://doi.org/10.1007/s10479-020-03677-7}
 \end{itemize}
-
-\clearpage
-\section{Anexos}
-
-\subsection*{Anexo A. Repositorio del código fuente}
-\noindent Enlace del proyecto: \url{https://github.com/EstebanR05/sistema_optimizacion_operaciones}
 
 \end{document}
