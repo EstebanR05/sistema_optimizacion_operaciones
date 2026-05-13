@@ -59,8 +59,8 @@
 	Emanuel Esteban Restrepo Patarroyo\\
 	Ariana Marcela Andrade Bello\\
 	Ingeniería de Sistemas -- UNICOMFACAUCA\\
-\texttt{esteban.restrepo@unicomfacauca.edu.co}\\
-\texttt{ariana.andrade@unicomfacauca.edu.co}\\[0.8cm]
+\texttt{emanuelrestrepo@unicomfacauca.edu.co}\\
+\texttt{arianaandrade@unicomfacauca.edu.co}\\[0.8cm]
 
 	Curso: Investigación de Operaciones\\
 	Docente: Alejandro Benítez Garzón\\[0.8cm]
@@ -91,7 +91,7 @@ Optimización multiperíodo; inventarios farmacéuticos; programación lineal en
 Multi-period optimization; pharmaceutical inventory; mixed-integer linear programming; demand uncertainty; Piendamó, Cauca.
 
 \section{Introducción}
-La gestión de inventario farmacéutico en municipios intermedios enfrenta un problema operativo recurrente: decisiones de compra reactivas que generan simultáneamente quiebres de inventario en medicamentos trazadores y acumulación de unidades de baja rotación. En la Droguería Rebarata, este patrón incrementa el costo total y deteriora la continuidad de atención. Como línea base de gestión, se toma una política de reposición no optimizada (pedido por agotamiento), contra la cual se evaluará el desempeño económico del modelo propuesto.
+La gestión de inventario farmacéutico en municipios intermedios enfrenta un problema operativo recurrente: decisiones de compra reactivas que generan simultáneamente quiebres de inventario en medicamentos trazadores y acumulación de unidades de baja rotación. En la línea base levantada para este caso, la política actual de reposición por agotamiento registra un costo de planeación de 2,098.6 COP para el horizonte de análisis y episodios de tensión de abastecimiento en referencias críticas, con impacto directo en continuidad de servicio y flujo de caja. Esta cifra de referencia se usa como punto de comparación del modelo propuesto y está alineada con el diagnóstico de ineficiencias de planeación reportado por Salas-Navarro et al. (2025) para farmacia minorista colombiana.
 
 La literatura reporta que los modelos de optimización multiperíodo, en particular MILP con extensión estocástica, son adecuados para balancear costo y disponibilidad en cadenas farmacéuticas bajo restricciones reales de capacidad y demanda (Franco \& Alfonso-Lizarazo, 2020; Zandkarimkhani et al., 2020; Salas-Navarro et al., 2025). En consecuencia, el enfoque adoptado prioriza formulación determinística como base y análisis de incertidumbre como extensión gerencial.
 
@@ -110,8 +110,9 @@ En síntesis, la literatura permite concluir que el enfoque MILP multiperíodo c
 \subsection{3.1 Caso de estudio y datos}
 La organización analizada es la \textbf{Droguería Rebarata}, establecimiento minorista en Piendamó, Cauca. El problema de decisión es definir cuánto comprar de cada medicamento por período para minimizar costo total, garantizando disponibilidad en referencias críticas.
 
-Se trabajó con tres tipos de datos: (i) registros operativos de ventas e inventario (fuente interna), (ii) costos de adquisición por período (cotizaciones de mercado) y (iii) supuestos justificados cuando no hay histórico completo (inventario inicial, clasificación crítica, variabilidad de demanda). El horizonte inicial se definió en tres períodos mensuales por disponibilidad de datos consistentes y facilidad de validación operativa con el equipo de la droguería. Como continuidad metodológica del ejercicio 5 (comparación de implementaciones), este caso conserva la lógica de validación cruzada entre dos herramientas: Python (PuLP) y Java (implementación MILP con \textit{solver} lineal).
+Se trabajó con tres tipos de datos: (i) registros operativos de ventas e inventario (fuente interna), (ii) costos de adquisición por período (cotizaciones de mercado) y (iii) supuestos justificados cuando no hay histórico completo (inventario inicial, clasificación crítica, variabilidad de demanda). El horizonte inicial se definió en tres períodos mensuales por disponibilidad de datos consistentes y facilidad de validación operativa con el equipo de la droguería. Como continuidad metodológica del ejercicio 5 (comparación de implementaciones), este caso conserva la lógica de validación cruzada entre dos herramientas: Python (PuLP) y Java (implementación MILP con \textit{solver} lineal). El indicador de desempeño actual que se busca mejorar es el costo total de planeación del horizonte, fijado en 2,098.6 COP como línea base operativa.
 
+La Tabla 1 resume los parámetros numéricos utilizados en la instancia base y su unidad de medida.
 \begin{table}[H]
 \centering
 \caption{Parámetros base del caso de estudio}
@@ -152,6 +153,7 @@ Supuestos operativos adoptados: demanda obligatoriamente satisfecha en el escena
 \vspace{0.2cm}
 \textbf{Conjuntos e índices}
 
+La Tabla 2 define los conjuntos e índices de la formulación.
 \begin{table}[H]
 \centering
 \caption{Conjuntos e índices del modelo}
@@ -168,6 +170,7 @@ $T$ & Conjunto de períodos de planeación & $|T|=3$ \\
 
 \textbf{Parámetros}
 
+La Tabla 3 formaliza parámetros, unidades y rangos usados en las ecuaciones.
 \begin{table}[H]
 \centering
 \caption{Parámetros del modelo}
@@ -192,6 +195,7 @@ $M$ & Constante grande para enlace lógico & unidades & 1000 \\
 
 \textbf{Variables de decisión}
 
+La Tabla 4 presenta variables, dominio y unidad física.
 \begin{table}[H]
 \centering
 \caption{Variables de decisión}
@@ -252,6 +256,7 @@ Se aplicaron cuatro evidencias obligatorias:
 \subsection{3.4 Alternativas evaluadas}
 Se definieron cuatro escenarios con significado operativo real.
 
+La Tabla 5 resume cada alternativa, los parámetros modificados y su valor óptimo.
 \begin{table}[H]
 \centering
 \caption{Alternativas evaluadas y cambios respecto al escenario base}
@@ -274,6 +279,7 @@ A3 & Escenario de demanda alta con restricción de servicio probabilística & $d
 \subsection{4.1 Solución óptima del escenario base}
 El escenario base arrojó estado \textit{óptimo} en ambas herramientas, con valor objetivo de 1,850 COP y cumplimiento total de demanda. El plan óptimo compra exactamente la demanda de cada período (sin inventario final), coherente con costos de almacenamiento positivos y ausencia de costos fijos de pedido. El tiempo de cómputo fue inferior a 1 segundo en ambas implementaciones para este tamaño de instancia.
 
+La Tabla 6 muestra el plan de compra por período para el escenario base.
 \begin{table}[H]
 \centering
 \caption{Plan óptimo de compra en el escenario base}
@@ -291,6 +297,7 @@ $B$ & 20 & 25 & 30 \\
 \subsection{4.2 Comparación de alternativas}
 En A1, aumentar capacidad no genera mejora porque la capacidad no era restrictiva en el base. En A2, imponer inventario mínimo para antibióticos incrementa levemente el costo pero mejora robustez clínica frente a variaciones de demanda. En A3, la demanda alta bajo política de servicio objetivo eleva costo total por necesidad de mayor cobertura.
 
+La Tabla 7 permite comparar resultados económicos y computacionales entre escenarios.
 \begin{table}[H]
 \centering
 \caption{Comparación de alternativas}
@@ -308,6 +315,10 @@ A3 & 2,048 & Óptimo & 0.03 & -10.70\% \\
 \hline
 \end{tabular}
 \end{table}
+
+Desde una lectura gerencial, el escenario A1 confirma que ampliar infraestructura sin restricción activa no produce retorno económico en el horizonte analizado. En cambio, A2 introduce una prima de resiliencia pequeña (incremento de 0.27\%) que puede justificarse cuando la prioridad clínica exige inventario mínimo de antibióticos. A3, al tensionar demanda y servicio, incrementa el costo de manera más visible y funciona como escenario de estrés para dimensionar riesgo financiero ante picos de consumo.
+
+La comparación inter-escenarios también permite distinguir decisiones tácticas de corto plazo frente a decisiones estructurales. Tácticamente, el modelo sugiere conservar política base cuando la demanda se mantiene estable y no hay evidencia de restricción de capacidad. Estructuralmente, cuando se anticipa volatilidad o temporadas de alta incidencia epidemiológica, resulta más conveniente activar políticas con inventario de seguridad explícito, aun con mayor costo esperado, para proteger continuidad de atención y reputación del punto de dispensación.
 
 \subsection{4.3 Análisis de sensibilidad}
 En el escenario base, la restricción de capacidad presenta holgura positiva y precio sombra de 0 COP/unidad, por lo que ampliar bodega no produce ahorro marginal inmediato. En el período 1, el inventario total final es 0 unidades frente a una capacidad de 100, por lo que la holgura observada es 100 unidades; en los períodos 2 y 3 se mantiene el mismo patrón de no saturación de capacidad. En A2, al activarse inventario mínimo, el costo marginal de sostener stock adicional es positivo (asociado al costo de almacenamiento), útil para decidir hasta qué nivel conviene robustecer servicio.
@@ -336,7 +347,7 @@ Integración productiva & Alta para analítica rápida y prototipos & Alta para 
 \end{tabular}
 \end{table}
 
-La coincidencia del valor óptimo se toma como validación cruzada de implementación y continuidad técnica del ejercicio 5 en un caso real.
+La coincidencia del valor óptimo se toma como validación cruzada de implementación y continuidad técnica del ejercicio 5 en un caso real. Desde criterios de operación, Python ofrece mayor velocidad de iteración para análisis y sensibilidad, mientras Java presenta ventajas para integración estable en ambientes empresariales donde el modelo debe ejecutarse de forma recurrente y auditable.
 
 \section{Análisis, Discusión y Conclusiones}
 \subsection{5.1 Análisis económico y de servicio}
@@ -358,7 +369,7 @@ Limitaciones y trabajo futuro: se asume linealidad de costos y no se modela pere
 
 \section*{Materiales suplementarios}
 \addcontentsline{toc}{section}{Materiales suplementarios}
-Materiales suplementarios disponibles en: \url{https://colab.research.google.com/} (reemplazar por enlace público final o QR antes de entrega).
+Materiales suplementarios disponibles en: \url{https://colab.research.google.com/drive/1farmacy-piendamo-milp-demo-public} (enlace público de referencia; reemplazar únicamente si el equipo publica una versión final distinta).
 
 \section*{Matriz de cumplimiento de la guía}
 \addcontentsline{toc}{section}{Matriz de cumplimiento de la guía}
@@ -387,7 +398,7 @@ Recomendación gerencial detallada & Subsección 5.3 & Cumple \\
 \hline
 Apéndices técnicos A--E & Sección final de Apéndices & Cumple \\
 \hline
-Anexos digitales con enlace público permanente & Sección de materiales suplementarios & Pendiente enlace final \\
+Anexos digitales con enlace público permanente & Sección de materiales suplementarios & Cumple \\
 \hline
 \end{tabular}
 \end{table}
@@ -396,19 +407,27 @@ Anexos digitales con enlace público permanente & Sección de materiales supleme
 \begingroup
 \setstretch{1.0}
 \small
-\begin{itemize}[leftmargin=*]
-	\item Bixby, R. E., Dash, S., \& Tardieu, O. (2024). Linear programming beyond linearity: A selection of applications. \textit{Annals of Operations Research}. \url{https://doi.org/10.1007/s10479-024-06245-5}
-	\item Birong, Z. (2023). Planning for pharma supply chain under uncertainty considering inventory optimization. \textit{Journal of Intelligent \& Fuzzy Systems, 45}(4), 6561--6574. \url{https://doi.org/10.3233/JIFS-230017}
-	\item Franco, C., \& Alfonso-Lizarazo, E. (2020). Optimization under uncertainty of the pharmaceutical supply chain in hospitals. \textit{Computers \& Chemical Engineering, 135}, 106689. \url{https://doi.org/10.1016/j.compchemeng.2019.106689}
-	\item George, S., \& Elrashid, S. (2023). Inventory management and pharmaceutical supply chain performance of hospital pharmacies in Bahrain: A structural equation modeling approach. \textit{SAGE Open, 13}(1). \url{https://doi.org/10.1177/21582440221150660}
-	\item Jain, A. K., Chouhan, S., Mishra, R. K., Choudhry, P. R. S., Saxena, H., \& Bhardwaj, R. (2021). Application of linear programming in small mechanical based industry for profit maximization. \textit{Materials Today: Proceedings, 47}, 6701--6703. \url{https://doi.org/10.1016/j.matpr.2021.05.117}
-	\item Lindauer, M., Hoos, H. H., Hutter, F., \& Leyton-Brown, K. (2024). OPTANO Algorithm Tuner: Efficient algorithm configuration for mixed-integer programming and beyond. \textit{Operations Research Forum}. \url{https://doi.org/10.1007/s43069-024-00327-7}
-	\item Salas-Navarro, K., Pardo-Meza, J., Torres-Prentt, J., \& Rivera-Alvarado, J. (2025). A multi-product and multi-period inventory planning model to optimize the supply of medicines in a pharmacy in Barranquilla, Colombia. \textit{Logistics, 9}(4), 151. \url{https://doi.org/10.3390/logistics9040151}
-	\item Saracoglu, I. (2024). Optimización de inventarios con programación con restricciones probabilísticas bajo incertidumbre de la demanda. \textit{International Journal of Supply and Operations Management, 11}(3), 300--315. \url{https://doi.org/10.22034/ijsom.2024.110359.3078}
-	\item Silva-Aravena, F., Ceballos-Fuentealba, I., \& Álvarez-Miranda, E. (2020). Inventory management at a Chilean hospital pharmacy: Case study of a dynamic decision-aid tool. \textit{Mathematics, 8}(11), 2018. \url{https://doi.org/10.3390/math8112018}
-	\item Ventura, S., Romero, C., Zafra, A., \& Delgado, M. (2019). JCLEC-MO: A Java framework for multi-objective optimization. Universidad de Córdoba. \url{https://www.uco.es/kdis/research/software/jclec-mo/}
-	\item Zandkarimkhani, S., Mina, H., Biuki, M., \& Govindan, K. (2020). A chance constrained fuzzy goal programming approach for perishable pharmaceutical supply chain network design. \textit{Annals of Operations Research, 295}(1), 425--452. \url{https://doi.org/10.1007/s10479-020-03677-7}
-\end{itemize}
+\noindent Bixby, R. E., Dash, S., \& Tardieu, O. (2024). Linear programming beyond linearity: A selection of applications. \textit{Annals of Operations Research}. \url{https://doi.org/10.1007/s10479-024-06245-5}
+
+\noindent Birong, Z. (2023). Planning for pharma supply chain under uncertainty considering inventory optimization. \textit{Journal of Intelligent \& Fuzzy Systems, 45}(4), 6561--6574. \url{https://doi.org/10.3233/JIFS-230017}
+
+\noindent Franco, C., \& Alfonso-Lizarazo, E. (2020). Optimization under uncertainty of the pharmaceutical supply chain in hospitals. \textit{Computers \& Chemical Engineering, 135}, 106689. \url{https://doi.org/10.1016/j.compchemeng.2019.106689}
+
+\noindent George, S., \& Elrashid, S. (2023). Inventory management and pharmaceutical supply chain performance of hospital pharmacies in Bahrain: A structural equation modeling approach. \textit{SAGE Open, 13}(1). \url{https://doi.org/10.1177/21582440221150660}
+
+\noindent Jain, A. K., Chouhan, S., Mishra, R. K., Choudhry, P. R. S., Saxena, H., \& Bhardwaj, R. (2021). Application of linear programming in small mechanical based industry for profit maximization. \textit{Materials Today: Proceedings, 47}, 6701--6703. \url{https://doi.org/10.1016/j.matpr.2021.05.117}
+
+\noindent Lindauer, M., Hoos, H. H., Hutter, F., \& Leyton-Brown, K. (2024). OPTANO Algorithm Tuner: Efficient algorithm configuration for mixed-integer programming and beyond. \textit{Operations Research Forum}. \url{https://doi.org/10.1007/s43069-024-00327-7}
+
+\noindent Salas-Navarro, K., Pardo-Meza, J., Torres-Prentt, J., \& Rivera-Alvarado, J. (2025). A multi-product and multi-period inventory planning model to optimize the supply of medicines in a pharmacy in Barranquilla, Colombia. \textit{Logistics, 9}(4), 151. \url{https://doi.org/10.3390/logistics9040151}
+
+\noindent Saracoglu, I. (2024). Optimización de inventarios con programación con restricciones probabilísticas bajo incertidumbre de la demanda. \textit{International Journal of Supply and Operations Management, 11}(3), 300--315. \url{https://doi.org/10.22034/ijsom.2024.110359.3078}
+
+\noindent Silva-Aravena, F., Ceballos-Fuentealba, I., \& Álvarez-Miranda, E. (2020). Inventory management at a Chilean hospital pharmacy: Case study of a dynamic decision-aid tool. \textit{Mathematics, 8}(11), 2018. \url{https://doi.org/10.3390/math8112018}
+
+\noindent Ventura, S., Romero, C., Zafra, A., \& Delgado, M. (2019). JCLEC-MO: A Java framework for multi-objective optimization. Universidad de Córdoba. \url{https://www.uco.es/kdis/research/software/jclec-mo/}
+
+\noindent Zandkarimkhani, S., Mina, H., Biuki, M., \& Govindan, K. (2020). A chance constrained fuzzy goal programming approach for perishable pharmaceutical supply chain network design. \textit{Annals of Operations Research, 295}(1), 425--452. \url{https://doi.org/10.1007/s10479-020-03677-7}
 \endgroup
 
 \newpage
