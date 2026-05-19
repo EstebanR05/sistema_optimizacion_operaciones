@@ -53,8 +53,8 @@
 \begin{titlepage}
 	\centering
 	\vspace*{1.8cm}
-	{\Large \textbf{Comparativa Java vs Python para la optimización multiperíodo del abastecimiento farmacéutico minorista en Piendamó}}\\[0.6cm]
-	{\large Reporte ejecutivo bajo rúbrica IMRAD adaptada}\\[1.4cm]
+	{\Large \textbf{Comparativa Java vs Python para la optimización multiperíodo del abastecimiento farmacéutico minorista en Piendamó}}\\[1.4cm]
+
 
 	Emanuel Esteban Restrepo Patarroyo\\
 	Ariana Marcela Andrade Bello\\
@@ -76,11 +76,29 @@
 
 \section*{Resumen}
 \addcontentsline{toc}{section}{Resumen}
-Este reporte aborda el problema de abastecimiento de la Droguería Rebarata (Piendamó, Cauca), donde coexisten faltantes en medicamentos críticos y sobreinventario en referencias de baja rotación, con impacto en costos y continuidad de servicio. El objetivo fue formular y evaluar un modelo MILP multiproducto y multiperíodo para definir cantidades óptimas de pedido bajo restricciones de demanda, balance de inventario y capacidad. La implementación se realizó en Java y se contrastó con Python para verificar consistencia técnica y operativa. En el escenario base (dos productos, tres períodos), el costo óptimo fue de 1{,}850 COP con cumplimiento total de demanda y sin inventario residual, lo que representa una mejora de 11.8\% frente a la política reactiva de referencia (2,098.6 COP). El análisis de sensibilidad mostró que la capacidad no es restrictiva en la base, mientras que imponer inventario de seguridad genera una prima de costo acotada y mejora la robustez del servicio. Se recomienda despliegue productivo en Java con revisión mensual de parámetros y escalamiento gradual condicionado al mantenimiento de niveles de servicio Tipo I y II de al menos 0.98.
+Este reporte aborda el problema real de abastecimiento de la Droguería Rebarata (Piendamó,
+Cauca), donde coexisten faltantes en medicamentos críticos y sobreinventario en referencias de baja
+rotación, con impacto en caja, costos logísticos y continuidad de servicio. El objetivo fue formular y
+evaluar un modelo de optimización multiproducto y multiperíodo, basado en programación lineal
+entera mixta (MILP), para definir cantidades óptimas de pedido por período bajo restricciones
+de demanda, balance de inventario y capacidad de almacenamiento. La metodología  se adaptó al contexto local, estructuró parámetros por producto y
+mes, y validó la formulación mediante cuatro pruebas: consistencia dimensional, casos extremos,
+convergencia entre herramientas (PuLP vs. Java) y coherencia operativa.
+En el escenario base (dos productos, tres períodos), el costo óptimo estimado fue de 1,850 COP
+con cumplimiento total de demanda y sin inventario residual; además, el análisis de sensibilidad
+indicó precio sombra nulo de capacidad en el caso base y valor marginal positivo cuando se impone
+inventario de seguridad. Frente al esquema reactivo de referencia, se proyecta una mejora de 11.8%  
+en costo de planeación y mayor estabilidad de abastecimiento. Se recomienda implementar un
+piloto trimestral para antibióticos y analgésicos críticos, con revisión mensual de parámetros y
+escalamiento al portafolio completo condicionado a mantener nivel de servicio tipo I y II iguales
+o superiores a 0.98. Los resultados son consistentes con evidencia previa sobre optimizacion de
+inventarios farmaceuticos bajo incertidumbre y respaldan adopcion gerencial inmediata en farmacias
+minoristas pequenas y medianas.
 
 \section*{Abstract}
 \addcontentsline{toc}{section}{Abstract}
-This report addresses a real replenishment problem at Droguería Rebarata (Piendamó, Cauca, Colombia), where stockouts of critical medicines coexist with overstocks of low-rotation products, affecting cash flow, logistics costs, and service continuity. The objective was to formulate and evaluate a multi-product, multi-period optimization model based on mixed-integer linear programming (MILP) to determine optimal order quantities by period under demand, inventory-balance, and storage-capacity constraints. The methodology adapted the approach of Salas-Navarro et al. (2025) to the local context, structured product-period parameters, and validated the formulation through four checks: dimensional consistency, extreme-case replication, cross-tool convergence (PuLP vs. compared implementation), and operational coherence. In the base scenario (two products, three periods), the estimated optimal cost was COP 1,850 with full demand satisfaction and zero ending inventory; sensitivity analysis also showed a zero capacity shadow price in the base case and a positive marginal value when safety stock is enforced. Compared with the current reactive policy, an 11.8\% planning-cost improvement and more stable replenishment are projected. A three-month pilot is recommended for critical antibiotics and analgesics, with monthly parameter updates and portfolio-wide scaling conditioned on maintaining Type I and Type II service levels at or above 0.98. Results are consistent with prior evidence on pharmaceutical inventory optimization under uncertainty and support immediate managerial adoption in small and medium retail pharmacies.
+This report addresses the real supply problem of Droguería Rebarata (Piendamó, Cauca), where shortages of critical medications coexist with overstock of low-turnover products, impacting cash flow, logistics costs, and service continuity. The objective was to formulate and evaluate a multi-product, multi-period optimization model based on mixed-integer linear programming (MILP) to determine optimal order quantities per period under demand, inventory balance, and storage capacity constraints. The methodology was adapted to the local context, structured parameters by product and month, and validated the formulation through four tests: dimensional consistency, extreme cases, convergence between tools (PuLP vs. Java), and operational coherence. In the base scenario (two products, three periods), the estimated optimal cost was 1,850 COP with full demand fulfillment and no residual inventory. In addition, the sensitivity analysis indicated a zero shadow price for capacity in the base case and a positive marginal value when safety inventory was imposed. Compared to the reference reactive scheme, an 11.8 improvement in planning cost and greater supply stability are projected. It is recommended to implement a quarterly pilot program for critical antibiotics and analgesics, with monthly parameter reviews and scaling to the full portfolio conditioned on maintaining Type I and Type II service levels equal to or greater than 0.98. The results are consistent with previous evidence on pharmaceutical inventory optimization under uncertainty and support immediate managerial adoption in small and medium-sized retail pharmacies.
+
 
 \section*{Palabras clave}
 \addcontentsline{toc}{section}{Palabras clave}
@@ -475,8 +493,3 @@ Comparación por criterios exigidos en guía:
 \end{itemize}
 
 \end{document}
-
-
-
-
-
