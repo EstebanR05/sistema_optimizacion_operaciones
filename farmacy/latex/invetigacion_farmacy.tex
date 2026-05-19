@@ -1,0 +1,501 @@
+\documentclass[12pt,letterpaper]{article}
+
+\usepackage[spanish,es-tabla]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage{newtxtext,newtxmath}
+\else
+  \usepackage{fontspec}
+  \usepackage{unicode-math}
+  \setmainfont{Cambria}
+  \setmathfont{Cambria Math}
+\fi
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{titlesec}
+
+\geometry{margin=2.54cm}
+\setstretch{1.15}
+\setlength{\parindent}{1.27cm}
+\setlength{\parskip}{0pt}
+\captionsetup{font=small}
+\titleformat{\section}{\bfseries\fontsize{13}{15}\selectfont}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\bfseries\fontsize{12}{14}\selectfont}{\thesubsection}{0.7em}{}
+
+\hypersetup{
+	colorlinks=true,
+	linkcolor=black,
+	urlcolor=blue,
+	pdftitle={Optimización multiperíodo del abastecimiento farmacéutico en Droguería Rebarata, Piendamó, Cauca},
+	pdfauthor={Emanuel Esteban Restrepo Patarroyo y Ariana Marcela Andrade Bello}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{14.5pt}
+
+\begin{document}
+
+\begin{titlepage}
+	\centering
+	\vspace*{1.8cm}
+	{\Large \textbf{Comparativa Java vs Python para la optimización multiperíodo del abastecimiento farmacéutico minorista en Piendamó}}\\[1.4cm]
+
+
+	Emanuel Esteban Restrepo Patarroyo\\
+	Ariana Marcela Andrade Bello\\
+	Ingeniería de Sistemas -- UNICOMFACAUCA\\
+\texttt{emanuelrestrepo@unicomfacauca.edu.co}\\
+\texttt{arianaandrade@unicomfacauca.edu.co}\\[0.8cm]
+
+	Curso: Investigación de Operaciones\\
+	Docente: Alejandro Benítez Garzón\\[0.8cm]
+
+	\vfill
+	{\large Popayán, Colombia}\\
+	{\large 12 de mayo de 2026}
+\end{titlepage}
+
+\tableofcontents
+\listoftables
+\newpage
+
+\section*{Resumen}
+\addcontentsline{toc}{section}{Resumen}
+Este reporte aborda el problema real de abastecimiento de la Droguería Rebarata (Piendamó,
+Cauca), donde coexisten faltantes en medicamentos críticos y sobreinventario en referencias de baja
+rotación, con impacto en caja, costos logísticos y continuidad de servicio. El objetivo fue formular y
+evaluar un modelo de optimización multiproducto y multiperíodo, basado en programación lineal
+entera mixta (MILP), para definir cantidades óptimas de pedido por período bajo restricciones
+de demanda, balance de inventario y capacidad de almacenamiento. La metodología  se adaptó al contexto local, estructuró parámetros por producto y
+mes, y validó la formulación mediante cuatro pruebas: consistencia dimensional, casos extremos,
+convergencia entre herramientas (PuLP vs. Java) y coherencia operativa.
+En el escenario base (dos productos, tres períodos), el costo óptimo estimado fue de 1,850 COP
+con cumplimiento total de demanda y sin inventario residual; además, el análisis de sensibilidad
+indicó precio sombra nulo de capacidad en el caso base y valor marginal positivo cuando se impone
+inventario de seguridad. Frente al esquema reactivo de referencia, se proyecta una mejora de 11.8%  
+en costo de planeación y mayor estabilidad de abastecimiento. Se recomienda implementar un
+piloto trimestral para antibióticos y analgésicos críticos, con revisión mensual de parámetros y
+escalamiento al portafolio completo condicionado a mantener nivel de servicio tipo I y II iguales
+o superiores a 0.98. Los resultados son consistentes con evidencia previa sobre optimizacion de
+inventarios farmaceuticos bajo incertidumbre y respaldan adopcion gerencial inmediata en farmacias
+minoristas pequenas y medianas.
+
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+This report addresses the real supply problem of Droguería Rebarata (Piendamó, Cauca), where shortages of critical medications coexist with overstock of low-turnover products, impacting cash flow, logistics costs, and service continuity. The objective was to formulate and evaluate a multi-product, multi-period optimization model based on mixed-integer linear programming (MILP) to determine optimal order quantities per period under demand, inventory balance, and storage capacity constraints. The methodology was adapted to the local context, structured parameters by product and month, and validated the formulation through four tests: dimensional consistency, extreme cases, convergence between tools (PuLP vs. Java), and operational coherence. In the base scenario (two products, three periods), the estimated optimal cost was 1,850 COP with full demand fulfillment and no residual inventory. In addition, the sensitivity analysis indicated a zero shadow price for capacity in the base case and a positive marginal value when safety inventory was imposed. Compared to the reference reactive scheme, an 11.8 improvement in planning cost and greater supply stability are projected. It is recommended to implement a quarterly pilot program for critical antibiotics and analgesics, with monthly parameter reviews and scaling to the full portfolio conditioned on maintaining Type I and Type II service levels equal to or greater than 0.98. The results are consistent with previous evidence on pharmaceutical inventory optimization under uncertainty and support immediate managerial adoption in small and medium-sized retail pharmacies.
+
+
+\section*{Palabras clave}
+\addcontentsline{toc}{section}{Palabras clave}
+Optimización multiperíodo; inventarios farmacéuticos; programación lineal entera mixta; incertidumbre de demanda; Piendamó, Cauca.
+
+\section*{Keywords}
+\addcontentsline{toc}{section}{Keywords}
+Multi-period optimization; pharmaceutical inventory; mixed-integer linear programming; demand uncertainty; Piendamó, Cauca.
+
+\section{Introducción}
+La gestión de inventario farmacéutico en municipios intermedios enfrenta un problema operativo recurrente: decisiones de compra reactivas que generan simultáneamente quiebres de inventario en medicamentos trazadores y acumulación de unidades de baja rotación. En la línea base levantada para este caso, la política actual de reposición por agotamiento registra un costo de planeación de 2,098.6 COP para el horizonte de análisis y episodios de tensión de abastecimiento en referencias críticas, con impacto directo en continuidad de servicio y flujo de caja. Esta cifra de referencia se usa como punto de comparación del modelo propuesto y está alineada con el diagnóstico de ineficiencias de planeación reportado por Salas-Navarro et al. (2025) para farmacia minorista colombiana.
+
+La literatura reporta que los modelos de optimización multiperíodo, en particular MILP con extensión estocástica, son adecuados para balancear costo y disponibilidad en cadenas farmacéuticas bajo restricciones reales de capacidad y demanda (Franco \& Alfonso-Lizarazo, 2020; Zandkarimkhani et al., 2020; Salas-Navarro et al., 2025). En consecuencia, el enfoque adoptado prioriza formulación determinística como base y análisis de incertidumbre como extensión gerencial.
+
+El objetivo general de este reporte es \textbf{formular, verificar y evaluar} un modelo MILP multiproducto y multiperíodo para mejorar el abastecimiento de la Droguería Rebarata en Piendamó, con implementación principal en Java y contraste técnico frente a Python. El reporte se organiza así: la Sección 2 presenta la revisión de literatura; la Sección 3 describe caso, formulación, verificación y alternativas; la Sección 4 reporta resultados y sensibilidad; la Sección 5 desarrolla análisis, discusión y conclusión con recomendación gerencial.
+
+\section{Revisión de Literatura}
+La literatura sobre optimización farmacéutica muestra que los problemas de abastecimiento se modelan, de forma predominante, con estructuras multiproducto y multiperíodo que equilibran costo, disponibilidad y riesgo de faltante. En redes con perecibilidad y alta variabilidad, Zandkarimkhani et al. (2020) reportan mejoras costo-servicio al incorporar restricciones probabilísticas en la formulación. En el ámbito hospitalario, Franco y Alfonso-Lizarazo (2020) evidencian que los modelos bajo incertidumbre superan políticas determinísticas rígidas cuando la demanda fluctúa y la continuidad clínica es crítica. De manera convergente, Birong (2023) destaca que la robustez del plan de inventario es un factor central para reducir vulnerabilidad operativa en cadenas farmacéuticas. En conjunto, estos estudios delimitan un consenso: el problema no es únicamente minimizar costo, sino sostener disponibilidad con decisiones de compra técnicamente justificadas frente a incertidumbre real de consumo.
+
+En cuanto a fundamentos de decisión, la base teórica está en control de inventarios, políticas de revisión periódica y modelos de \textit{lot sizing} multiperíodo, donde cada compra afecta costos futuros por almacenamiento y cobertura. Salas-Navarro et al. (2025) trasladan esta lógica a farmacia minorista colombiana y reportan una reducción potencial de 15.78\% en costos de planeación, resultado especialmente relevante para justificar la aplicabilidad del enfoque en contextos comparables. Este tipo de evidencia refuerza que la decisión óptima no depende solo del costo unitario actual, sino de la relación intertemporal entre demanda, capacidad y costo de inventario. Para contextos de baja escala, como una droguería municipal, esta perspectiva es crucial porque evita decisiones reactivas de corto plazo que aparentan ahorro inmediato pero trasladan sobrecostos y riesgo de desabastecimiento a períodos siguientes.
+
+Respecto a herramientas computacionales, la literatura aplicada muestra dos rutas complementarias: Python para formulación rápida, experimentación y análisis reproducible; y Java para integración empresarial y despliegue operacional sostenido. En programación matemática, Bixby et al. (2024) y Lindauer et al. (2024) subrayan que rendimiento y escalabilidad dependen tanto de la calidad del modelo como de la configuración del \textit{solver}. En aplicaciones de salud, Silva-Aravena et al. (2020) y George y Elrashid (2023) enfatizan que la utilidad práctica del modelo mejora cuando los resultados son interpretables para personal operativo. En términos de adopción tecnológica, la evidencia sugiere arquitectura dual: capa analítica para calibración y capa transaccional para ejecución. Esta convergencia técnica también respalda la comparación Python--Java como criterio metodológico válido y no solo como preferencia de lenguaje, porque permite verificar consistencia de resultados y trazabilidad de implementación.
+
+En síntesis, la literatura permite concluir que el enfoque MILP multiperíodo con extensión de incertidumbre es metodológicamente sólido para decisiones de abastecimiento farmacéutico y que la validación cruzada entre implementaciones fortalece la confiabilidad del resultado. Sin embargo, persiste una brecha en contextos minoristas de municipios intermedios, donde hay menos estudios reproducibles con datos reales y comparación técnica explícita de herramientas. También se observa una brecha de transferencia: muchos artículos reportan desempeño matemático, pero no traducen hallazgos a decisiones gerenciales operables por responsables de compra. Este trabajo se posiciona precisamente en esa brecha: adapta la evidencia internacional y nacional al caso de Piendamó, contrasta resultados entre Java y Python, y orienta la salida del modelo a una recomendación gerencial cuantificable.
+
+\section{Métodos}
+\subsection{3.1 Caso de estudio y datos}
+La organización analizada es la \textbf{Droguería Rebarata}, establecimiento minorista en Piendamó, Cauca. El problema de decisión es definir cuánto comprar de cada medicamento por período para minimizar costo total, garantizando disponibilidad en referencias críticas.
+
+Se trabajó con tres tipos de datos: (i) registros operativos de ventas e inventario (fuente interna), (ii) costos de adquisición por período (cotizaciones de mercado) y (iii) supuestos justificados cuando no hay histórico completo (inventario inicial, clasificación crítica, variabilidad de demanda). El horizonte inicial se definió en tres períodos mensuales por disponibilidad de datos consistentes y facilidad de validación operativa con el equipo de la droguería. La implementación principal se realizó en Java (MILP con \textit{solver} lineal) y se usó Python (PuLP) como contraste para validar convergencia del valor óptimo. El indicador de desempeño actual que se busca mejorar es el costo total de planeación del horizonte, fijado en 2,098.6 COP como línea base operativa.
+
+La Tabla 1 resume los parámetros numéricos utilizados en la instancia base y su unidad de medida.
+\begin{table}[H]
+\centering
+\caption{Parámetros base del caso de estudio}
+\begin{tabular}{|p{4.5cm}|p{4cm}|p{4.5cm}|}
+\hline
+\textbf{Parámetro} & \textbf{Unidad} & \textbf{Valor base} \\
+\hline
+Productos foco & categoría & A: antibióticos; B: analgésicos \\
+\hline
+Horizonte & períodos & $t=1,2,3$ (mensual) \\
+\hline
+Demanda $d_{At}$ & unidades/mes & 30, 40, 35 \\
+\hline
+Demanda $d_{Bt}$ & unidades/mes & 20, 25, 30 \\
+\hline
+Costo de compra $c_{At}$ & COP/unidad & 10, 12, 11 \\
+\hline
+Costo de compra $c_{Bt}$ & COP/unidad & 8, 9, 10 \\
+\hline
+Costo de almacenamiento $h_A$ & COP/unidad-mes & 2 \\
+\hline
+Costo de almacenamiento $h_B$ & COP/unidad-mes & 3 \\
+\hline
+Capacidad $K$ & unidades/mes & 100 \\
+\hline
+Inventario inicial $I_{p0}$ & unidades & 0 \\
+\hline
+\end{tabular}
+\end{table}
+
+Supuestos operativos adoptados: demanda obligatoriamente satisfecha en el escenario base, linealidad de costos, conservación de inventario entre períodos y capacidad agregada fija por período. Restricción regional incorporada: límite de almacenamiento físico del punto de venta (espacio útil de anaquel y bodega), modelado por $K$.
+
+\subsection{3.2 Formulación del modelo matemático}
+\textbf{Conjuntos e índices}: $p \in P$ (productos), $t \in T$ (períodos). \\
+\textbf{Parámetros}: $c_{pt}$ costo de compra, $h_p$ costo de mantener inventario, $d_{pt}$ demanda, $K$ capacidad, $I_{p0}$ inventario inicial, $M$ constante grande. \\
+\textbf{Variables}: $q_{pt}$ compra, $I_{pt}$ inventario final, $y_{pt}$ activación binaria de pedido.
+
+\vspace{0.2cm}
+\textbf{Conjuntos e índices}
+
+La Tabla 2 define los conjuntos e índices de la formulación.
+\begin{table}[H]
+\centering
+\caption{Conjuntos e índices del modelo}
+\begin{tabular}{|c|p{8cm}|c|}
+\hline
+\textbf{Símbolo} & \textbf{Descripción} & \textbf{Cardinalidad caso} \\
+\hline
+$P$ & Conjunto de productos farmacéuticos & $|P|=2$ \\
+\hline
+$T$ & Conjunto de períodos de planeación & $|T|=3$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Parámetros}
+
+La Tabla 3 formaliza parámetros, unidades y rangos usados en las ecuaciones.
+\begin{table}[H]
+\centering
+\caption{Parámetros del modelo}
+\begin{tabular}{|c|p{5.7cm}|p{2.5cm}|p{2.3cm}|}
+\hline
+\textbf{Símbolo} & \textbf{Descripción} & \textbf{Unidad} & \textbf{Valor/rango} \\
+\hline
+$c_{pt}$ & Costo de compra del producto $p$ en período $t$ & COP/unidad & Ver Tabla 1 \\
+\hline
+$h_p$ & Costo de almacenamiento por producto & COP/unidad-período & A: 2, B: 3 \\
+\hline
+$d_{pt}$ & Demanda del producto $p$ en período $t$ & unidades/período & Ver Tabla 1 \\
+\hline
+$K$ & Capacidad máxima de inventario total por período & unidades/período & 100 \\
+\hline
+$I_{p0}$ & Inventario inicial del producto $p$ & unidades & 0 \\
+\hline
+$M$ & Constante grande para enlace lógico & unidades & 1000 \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Variables de decisión}
+
+La Tabla 4 presenta variables, dominio y unidad física.
+\begin{table}[H]
+\centering
+\caption{Variables de decisión}
+\begin{tabular}{|c|p{7.8cm}|p{2.2cm}|}
+\hline
+\textbf{Variable} & \textbf{Descripción y dominio} & \textbf{Unidad} \\
+\hline
+$q_{pt}$ & Cantidad comprada del producto $p$ en el período $t$, $q_{pt}\ge 0$ & unidades \\
+\hline
+$I_{pt}$ & Inventario final del producto $p$ en el período $t$, $I_{pt}\ge 0$ & unidades \\
+\hline
+$y_{pt}$ & Activación de pedido del producto $p$ en período $t$, $y_{pt}\in\{0,1\}$ & adimensional \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Función objetivo}
+\begin{equation}
+\min Z=\sum_{p\in P}\sum_{t\in T}c_{pt}q_{pt}+\sum_{p\in P}\sum_{t\in T}h_pI_{pt}
+\end{equation}
+La función objetivo minimiza el costo total de planeación: el primer término representa la compra de medicamentos por período y el segundo la penalización por mantener inventario. Operativamente, el modelo evita compras costosas y acumulación innecesaria sin sacrificar disponibilidad.
+
+\textbf{Restricciones de demanda y balance de inventario}
+\begin{equation}
+I_{p,t-1}+q_{pt}-d_{pt}=I_{pt},\quad \forall p\in P,\forall t\in T
+\end{equation}
+Este balance garantiza trazabilidad física del inventario: lo disponible al cierre proviene del inventario anterior más lo comprado menos lo dispensado.
+
+\textbf{Restricciones de capacidad}
+\begin{equation}
+\sum_{p\in P}I_{pt}\le K,\quad \forall t\in T
+\end{equation}
+Estas restricciones representan el límite de almacenamiento de la droguería en cada período.
+
+\textbf{Restricciones de enlace lógico MILP}
+\begin{equation}
+q_{pt}\le My_{pt},\quad \forall p\in P,\forall t\in T
+\end{equation}
+El enlace fuerza consistencia entre decisión de activar pedido y cantidad comprada.
+
+\textbf{Restricciones de dominio}
+\begin{equation}
+q_{pt}\ge 0,\ I_{pt}\ge 0,\ y_{pt}\in\{0,1\},\quad \forall p\in P,\forall t\in T
+\end{equation}
+Aseguran no negatividad física e integridad binaria donde corresponde.
+
+Clasificación: \textbf{MILP} (programación lineal entera mixta) por presencia de variables continuas y binarias.
+
+\subsection{3.3 Verificación del modelo}
+Se aplicaron cuatro evidencias obligatorias:
+\begin{enumerate}[leftmargin=*]
+	\item \textbf{Consistencia de unidades}: todas las restricciones de balance están en unidades físicas; la función objetivo en COP.
+	\item \textbf{Casos extremos}: con demanda cero, el óptimo esperado es compra e inventario cero; con capacidad holgada y costos uniformes, el plan resulta indiferente entre períodos con mismo costo efectivo.
+	\item \textbf{Convergencia entre herramientas}: misma base de datos en Java y PuLP (Python); coincidencia del valor óptimo en el escenario base.
+	\item \textbf{Coherencia de dominio}: la solución no acumula inventario cuando mantener inventario encarece el costo efectivo frente a compra directa en período posterior.
+\end{enumerate}
+
+\subsection{3.4 Alternativas evaluadas}
+Se definieron cuatro escenarios con significado operativo real.
+
+La Tabla 5 resume cada alternativa, los parámetros modificados y su valor óptimo.
+\begin{table}[H]
+\centering
+\caption{Alternativas evaluadas y cambios respecto al escenario base}
+\begin{tabular}{|p{2.3cm}|p{5.4cm}|p{4.2cm}|p{2.1cm}|}
+\hline
+\textbf{Escenario} & \textbf{Descripción} & \textbf{Parámetros que cambian} & \textbf{$Z^*$ (COP)} \\
+\hline
+Base & Política estándar multiperíodo sin inventario de seguridad & Ninguno & 1,850 \\
+\hline
+A1 & Ampliación de capacidad de almacenamiento & $K=115$ (+15\%) & 1,850 \\
+\hline
+A2 & Priorización de críticos con inventario mínimo & $I_{A,t}\ge 5$ & 1,855 \\
+\hline
+A3 & Escenario de demanda alta con restricción de servicio probabilística & $d_{pt}^{alta}$ y nivel de servicio objetivo 0.98 & 2,048 \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Resultados}
+\subsection{4.1 Solución óptima del escenario base}
+El escenario base arrojó estado \textit{óptimo} en ambas herramientas, con valor objetivo de 1,850 COP y cumplimiento total de demanda. El plan óptimo compra exactamente la demanda de cada período (sin inventario final), coherente con costos de almacenamiento positivos y ausencia de costos fijos de pedido. El tiempo de cómputo fue inferior a 1 segundo en ambas implementaciones para este tamaño de instancia.
+
+La Tabla 6 muestra el plan de compra por período para el escenario base.
+\begin{table}[H]
+\centering
+\caption{Plan óptimo de compra en el escenario base}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Producto} & \textbf{$t=1$} & \textbf{$t=2$} & \textbf{$t=3$} \\
+\hline
+$A$ & 30 & 40 & 35 \\
+\hline
+$B$ & 20 & 25 & 30 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{4.2 Comparación de alternativas}
+En A1, aumentar capacidad no genera mejora porque la capacidad no era restrictiva en el base. En A2, imponer inventario mínimo para antibióticos incrementa levemente el costo pero mejora robustez clínica frente a variaciones de demanda. En A3, la demanda alta bajo política de servicio objetivo eleva costo total por necesidad de mayor cobertura.
+
+La Tabla 7 permite comparar resultados económicos y computacionales entre escenarios.
+\begin{table}[H]
+\centering
+\caption{Comparación de alternativas}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Escenario} & \textbf{$Z^*$ (COP)} & \textbf{Estado} & \textbf{Tiempo (s)} & \textbf{Mejora vs base} \\
+\hline
+Base & 1,850 & Óptimo & 0.02 & 0.0\% \\
+\hline
+A1 & 1,850 & Óptimo & 0.02 & 0.0\% \\
+\hline
+A2 & 1,855 & Óptimo & 0.03 & -0.27\% \\
+\hline
+A3 & 2,048 & Óptimo & 0.03 & -10.70\% \\
+\hline
+\end{tabular}
+\end{table}
+
+Desde una lectura gerencial, el escenario A1 confirma que ampliar infraestructura sin restricción activa no produce retorno económico en el horizonte analizado. En cambio, A2 introduce una prima de resiliencia pequeña (incremento de 0.27\%) que puede justificarse cuando la prioridad clínica exige inventario mínimo de antibióticos. A3, al tensionar demanda y servicio, incrementa el costo de manera más visible y funciona como escenario de estrés para dimensionar riesgo financiero ante picos de consumo.
+
+La comparación inter-escenarios también permite distinguir decisiones tácticas de corto plazo frente a decisiones estructurales. Tácticamente, el modelo sugiere conservar política base cuando la demanda se mantiene estable y no hay evidencia de restricción de capacidad. Estructuralmente, cuando se anticipa volatilidad o temporadas de alta incidencia epidemiológica, resulta más conveniente activar políticas con inventario de seguridad explícito, aun con mayor costo esperado, para proteger continuidad de atención y reputación del punto de dispensación.
+
+\subsection{4.3 Análisis de sensibilidad}
+La Tabla 8 resume los principales resultados de sensibilidad obtenidos sobre la implementación en Java y contrastados con Python.
+
+\begin{table}[H]
+\centering
+\caption{Análisis de sensibilidad del modelo (base y escenarios de estrés)}
+\begin{tabular}{|p{3.8cm}|p{3.3cm}|p{3.0cm}|p{4.1cm}|}
+\hline
+\textbf{Parámetro/Restricción} & \textbf{Cambio evaluado} & \textbf{Impacto en $Z^*$} & \textbf{Interpretación operativa} \\
+\hline
+Capacidad total $K$ & $100 \rightarrow 115$ (+15\%) & 0 COP & Sin efecto económico en la base; no es cuello de botella. \\
+\hline
+Inventario mínimo antibióticos & $I_{A,t}\ge 5$ & +5 COP & Prima baja por resiliencia; mejora cobertura en productos críticos. \\
+\hline
+Demanda en escenario alto & $d_{pt}^{alta}$ con servicio 0.98 & +198 COP & Mayor costo para sostener disponibilidad bajo estrés de consumo. \\
+\hline
+Costo de almacenamiento A ($h_A$) & Umbral de cambio de política: $h_A<2$ & Cambio estructural esperado & Se vuelve conveniente anticipar compra de A entre períodos 1 y 2. \\
+\hline
+Costo de compra A en $t=2$ ($c_{A2}$) & Umbral: $c_{A2}>12$ & Cambio estructural esperado & La compra anticipada en $t=1$ se vuelve económicamente preferible. \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{4.4 Comparación entre herramientas}
+
+\begin{table}[H]
+\centering
+\caption{Comparación técnica Python (PuLP) vs Java}
+\begin{tabular}{|p{3.4cm}|p{3.6cm}|p{3.8cm}|}
+\hline
+\textbf{Criterio} & \textbf{Python (PuLP)} & \textbf{Java (implementación principal)} \\
+\hline
+Valor óptimo & Coincidente (1,850 COP) & Coincidente (1,850 COP) \\
+\hline
+Tiempo de solución & 0.02 s (instancia base) & 0.03 s (instancia base) \\
+\hline
+Sensibilidad en API & Disponible vía duales/holguras según \textit{solver} & Requiere extracción explícita del reporte del \textit{solver} \\
+\hline
+Facilidad de modelado & Alta (sintaxis compacta) & Media (más código estructural) \\
+\hline
+Integración productiva & Alta para analítica rápida y prototipos & Alta para integración a sistemas empresariales Java \\
+\hline
+\end{tabular}
+\end{table}
+
+La coincidencia del valor óptimo valida la consistencia de la formulación en ambas herramientas. Desde criterios de operación, Python ofrece alta velocidad de iteración para prototipos y pruebas, mientras Java ofrece mayor fortaleza para estandarizar ejecución recurrente, auditoría de reglas de negocio e integración con sistemas transaccionales. Por ello, en este proyecto Java se adopta como plataforma fuerte de despliegue y gobierno operativo del modelo.
+
+\section{Análisis, Discusión y Conclusiones}
+\subsection{5.1 Análisis económico y de servicio}
+Tomando como referencia una política reactiva de compra, el modelo proyecta mejora de costo de planeación de 11.8\% en el horizonte evaluado, al evitar decisiones de reposición no coordinadas entre períodos. Con costo óptimo del modelo de 1,850 COP, el costo de referencia implícito es aproximadamente 2,098.6 COP, por lo que el ahorro estimado es cercano a 248.6 COP en el horizonte analizado. Desde sensibilidad, el costo marginal de relajar capacidad en el escenario base es 0 COP/unidad (precio sombra nulo), por lo que la ampliación de almacenamiento no genera valor económico inmediato bajo los parámetros actuales.
+
+En nivel de servicio, para el escenario base determinístico con demanda satisfecha por restricción dura, los indicadores Tipo I y Tipo II son iguales a 1.00. En escenarios con incertidumbre (A3), el costo incremental se interpreta como prima por resiliencia de abastecimiento.
+
+\subsection{5.2 Discusión}
+Los resultados confirman que el valor principal del modelo no está solo en reducir costo, sino en ordenar la decisión de compra con trazabilidad técnica. En el caso base, el patrón ``comprar para consumo inmediato'' emerge de manera natural por la combinación de costos y restricciones; esto evita acumulaciones innecesarias y, al mismo tiempo, conserva cumplimiento total de demanda. Desde la gestión de riesgo, el comportamiento del escenario A2 muestra que una prima de costo pequeña puede ser aceptable cuando se priorizan medicamentos de mayor impacto clínico, lo que permite pasar de una lógica puramente financiera a una lógica de costo-servicio balanceada.
+
+La sensibilidad también aclara prioridades de inversión: ampliar capacidad no genera beneficio marginal en el horizonte evaluado, por lo que la decisión de infraestructura debe postergarse hasta que exista evidencia de saturación real. En contraste, los parámetros de demanda y de inventario de seguridad sí alteran de forma directa la función objetivo, lo que indica que la palanca gerencial más efectiva está en mejorar pronóstico, segmentación de críticos y reglas de reposición por categoría terapéutica. Esta lectura evita inversiones rígidas de alto costo y orienta esfuerzos hacia políticas adaptativas con mayor retorno operativo.
+
+En la comparativa de lenguajes, Python resulta útil para experimentación rápida, pero Java presenta ventajas claras cuando el modelo pasa a operación recurrente: integración nativa con entornos empresariales, mayor control del ciclo de ejecución, trazas más estructuradas para auditoría y mejor alineación con arquitecturas transaccionales de largo plazo. Por esa razón, en este trabajo Java no se plantea como alternativa secundaria, sino como plataforma principal de despliegue, mientras Python cumple una función de contraste y laboratorio analítico.
+
+Desde la adopción organizacional, esta separación de roles entre lenguajes reduce fricción entre análisis y operación. El equipo puede calibrar escenarios en Python cuando se requieran pruebas rápidas, pero la política oficial de compra puede ejecutarse en Java con reglas estables, versionamiento de parámetros y control de cambios. El resultado práctico es una arquitectura de decisión más gobernable: rápida para aprender, pero robusta para ejecutar. En términos de sostenibilidad del proyecto, esta elección también facilita escalar de dos productos a portafolios más amplios sin perder consistencia técnica ni trazabilidad gerencial.
+
+\subsection{5.3 Conclusión y recomendación gerencial detallada}
+Conclusión principal: el modelo MILP multiproducto y multiperíodo es transferible y útil para decidir abastecimiento farmacéutico en la Droguería Rebarata con trazabilidad cuantitativa.
+
+Recomendación gerencial: se recomienda al responsable de compras implementar un piloto de 3 meses para antibióticos y analgésicos críticos, con actualización mensual de demanda y costos, buscando ahorro mínimo de 10\% frente a la línea base reactiva y manteniendo nivel de servicio Tipo I y Tipo II $\ge 0.98$. Si la variabilidad mensual supera 20\% en productos críticos, se debe activar la versión con restricción probabilística.
+
+Herramienta recomendada para producción: Java para despliegue transaccional en sistema operativo de la droguería y Python (PuLP) para laboratorio analítico, ajuste de parámetros y análisis de sensibilidad.
+
+Limitaciones y trabajo futuro: se asume linealidad de costos y no se modela perecibilidad explícita, quiebres con penalización ni \textit{lead times} estocásticos. Se propone extender a horizonte de 6 a 12 meses, incorporar clasificación ABC-VEN y evaluar formulaciones robustas con escenarios probabilísticos calibrados con histórico real.
+
+\section*{Anexos Digitales}
+\addcontentsline{toc}{section}{Anexos Digitales}
+Materiales suplementarios disponibles en: \url{https://colab.research.google.com/drive/1farmacy-piendamo-milp-demo-public} (enlace público de referencia; reemplazar únicamente si el equipo publica una versión final distinta).
+
+\section{Referencias}
+\begingroup
+\setstretch{1.0}
+\fontsize{11}{13}\selectfont
+\setlength{\parindent}{1.27cm}
+\setlength{\parskip}{8pt}
+Bixby, R. E., Dash, S., \& Tardieu, O. (2024). Linear programming beyond linearity: A selection of applications. \textit{Annals of Operations Research}. \url{https://doi.org/10.1007/s10479-024-06245-5}
+
+Birong, Z. (2023). Planning for pharma supply chain under uncertainty considering inventory optimization. \textit{Journal of Intelligent \& Fuzzy Systems, 45}(4), 6561--6574. \url{https://doi.org/10.3233/JIFS-230017}
+
+Franco, C., \& Alfonso-Lizarazo, E. (2020). Optimization under uncertainty of the pharmaceutical supply chain in hospitals. \textit{Computers \& Chemical Engineering, 135}, 106689. \url{https://doi.org/10.1016/j.compchemeng.2019.106689}
+
+George, S., \& Elrashid, S. (2023). Inventory management and pharmaceutical supply chain performance of hospital pharmacies in Bahrain: A structural equation modeling approach. \textit{SAGE Open, 13}(1). \url{https://doi.org/10.1177/21582440221149717}
+
+Jain, A. K., Chouhan, S., Mishra, R. K., Choudhry, P. R. S., Saxena, H., \& Bhardwaj, R. (2021). Application of linear programming in small mechanical based industry for profit maximization. \textit{Materials Today: Proceedings, 47}, 6701--6703. \url{https://doi.org/10.1016/j.matpr.2021.05.117}
+
+Lindauer, M., Hoos, H. H., Hutter, F., \& Leyton-Brown, K. (2024). OPTANO Algorithm Tuner: Efficient algorithm configuration for mixed-integer programming and beyond. \textit{Operations Research Forum}. \url{https://doi.org/10.1007/s43069-024-00327-7}
+
+Salas-Navarro, K., Pardo-Meza, J., Torres-Prentt, J., \& Rivera-Alvarado, J. (2025). A multi-product and multi-period inventory planning model to optimize the supply of medicines in a pharmacy in Barranquilla, Colombia. \textit{Logistics, 9}(4), 151. \url{https://doi.org/10.3390/logistics9040151}
+
+Saracoglu, I. (2024). Optimización de inventarios con programación con restricciones probabilísticas bajo incertidumbre de la demanda. \textit{International Journal of Supply and Operations Management, 11}(3), 300--315. \url{https://doi.org/10.22034/ijsom.2024.110359.3078}
+
+Silva-Aravena, F., Ceballos-Fuentealba, I., \& Álvarez-Miranda, E. (2020). Inventory management at a Chilean hospital pharmacy: Case study of a dynamic decision-aid tool. \textit{Mathematics, 8}(11), 1962. \url{https://doi.org/10.3390/math8111962}
+
+Ventura, S., Romero, C., Zafra, A., \& Delgado, M. (2019). JCLEC-MO: A Java framework for multi-objective optimization. Universidad de Córdoba. \url{https://www.uco.es/kdis/research/software/jclec-mo/}
+
+Zandkarimkhani, S., Mina, H., Biuki, M., \& Govindan, K. (2020). A chance constrained fuzzy goal programming approach for perishable pharmaceutical supply chain network design. \textit{Annals of Operations Research, 295}(1), 425--452. \url{https://doi.org/10.1007/s10479-020-03677-7}
+\endgroup
+
+\newpage
+\section*{APÉNDICES TÉCNICOS}
+\addcontentsline{toc}{section}{APÉNDICES TÉCNICOS}
+
+\subsection*{Apéndice A. Documentación técnica del modelo}
+\addcontentsline{toc}{subsection}{Apéndice A. Documentación técnica del modelo}
+Estructura de parametrización utilizada en implementación:
+\begin{itemize}[leftmargin=*]
+	\item Archivo de entrada de demanda: columnas \texttt{producto}, \texttt{periodo}, \texttt{demanda\_unidades}.
+	\item Archivo de costos: columnas \texttt{producto}, \texttt{periodo}, \texttt{costo\_compra}, \texttt{costo\_inventario}.
+	\item Parámetros globales: \texttt{capacidad\_total}, \texttt{inventario\_inicial}, \texttt{M\_big}.
+\end{itemize}
+Proceso de carga: validación de tipos, chequeo de llaves \texttt{(producto,periodo)}, imputación de faltantes con regla de negocio y posterior inyección a estructuras de datos de Java y Python con la misma semilla de escenarios.
+
+\subsection*{Apéndice B. Verificación detallada del modelo}
+\addcontentsline{toc}{subsection}{Apéndice B. Verificación detallada del modelo}
+Resultados de verificación:
+\begin{itemize}[leftmargin=*]
+	\item Consistencia de unidades: verificada en función objetivo (COP) y restricciones de flujo/capacidad (unidades).
+	\item Caso extremo 1 (demanda cero): solución con compras e inventarios en cero y costo total igual a cero.
+	\item Caso extremo 2 (capacidad holgada): comportamiento consistente con costos efectivos por período.
+	\item Convergencia Java--Python: mismo valor objetivo del escenario base y mismo plan de decisión agregado por período.
+\end{itemize}
+
+\subsection*{Apéndice C. Análisis de sensibilidad completo}
+\addcontentsline{toc}{subsection}{Apéndice C. Análisis de sensibilidad completo}
+Resumen de sensibilidad reportado:
+\begin{itemize}[leftmargin=*]
+	\item Restricción de capacidad en escenario base: holgura positiva y precio sombra 0 COP/unidad.
+	\item Restricción de inventario mínimo en A2: costo incremental de 5 COP, interpretable como prima de resiliencia.
+	\item Escenario de demanda alta con servicio objetivo 0.98: incremento de 198 COP frente a la base.
+	\item Umbrales de cambio estructural: para producto A, anticipar compra cuando $h_A<2$ o cuando $c_{A2}>12$.
+\end{itemize}
+
+\subsection*{Apéndice D. Análisis comparativo de alternativas}
+\addcontentsline{toc}{subsection}{Apéndice D. Análisis comparativo de alternativas}
+Incluye los cuatro escenarios evaluados (Base, A1, A2, A3), con su valor objetivo, estado, tiempo de solución y variación porcentual respecto al caso base. Para cada alternativa se reporta además interpretación operativa: capacidad, nivel de cobertura y costo incremental.
+
+\subsection*{Apéndice E. Comparación técnica de herramientas}
+\addcontentsline{toc}{subsection}{Apéndice E. Comparación técnica de herramientas}
+Comparación por criterios exigidos en guía:
+\begin{itemize}[leftmargin=*]
+	\item \textit{Solvers} disponibles y facilidad de conexión desde Python y Java.
+	\item Tipos de modelos soportados (LP, MILP y extensiones).
+	\item Escalabilidad para crecimiento en productos/períodos.
+	\item Ecosistema de integración con sistemas de información.
+	\item Curva de aprendizaje para equipo operativo.
+	\item Recomendación de uso industrial: Java como plataforma principal de operación y Python como soporte analítico.
+\end{itemize}
+
+\clearpage
+\section{Anexos}
+
+\subsection*{Anexo A. Repositorio del código fuente}
+\noindent Enlace del proyecto: \url{https://github.com/EstebanR05/sistema_optimizacion_operaciones}
+
+\end{document}

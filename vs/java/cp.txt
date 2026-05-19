@@ -1,0 +1,1 @@
+/home/estebanr/.m2/repository/org/ojalgo/ojalgo/55.2.0/ojalgo-55.2.0.jar
